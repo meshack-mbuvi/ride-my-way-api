@@ -30,6 +30,9 @@ class RidesofferTests(unittest.TestCase):
                                  data=json.dumps(ride),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 201)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data['message'],
+                         'ride offer added successfully.')
 
     def test_cannot_create_ride_with_wrong_date_time(self):
         """Tests that date is parsed in the specified format
