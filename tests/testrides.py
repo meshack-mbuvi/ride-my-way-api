@@ -10,7 +10,6 @@ class RidesofferTests(unittest.TestCase):
         """Prepare testing environment """
 
         self.app = create_app('testing')
-        self.app.config.from_object(configuration['testing'])
         self.app = self.app.test_client()
 
     def tearDown(self):
@@ -78,23 +77,22 @@ class RidesofferTests(unittest.TestCase):
         self.assertEqual(response_data['message'],
                          "available space can only be numbers.")
 
-    def test_get_all_rides(self):
+    def test_user_can_get_all_rides(self):
         """test user can get available ride offers"""
         response = self.app.get('/api/v1/rides',
                                 content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
-    def test_get_a_ride(self):
+    def test_user_can_get_a_ride(self):
         """test user can get a single ride offer"""
         response = self.app.get('/api/v1/rides/1',
                                 content_type='application/json')
-        self.assertEqual(response.status_code, 200,
-                         message="Should retrieve all ride offers")
+        self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(len(response_data), 1)
         self.assertEqual(response_data['id'], 1)
 
-    def test_get_ride_that_does_not_exist(self):
+    def test_user_cannot_get_ride_that_does_not_exist(self):
         """Assumes no ride with a negative id number"""
         response = self.app.get('/api/v1/rides/-1',
                                 content_type='application/json')
@@ -102,7 +100,7 @@ class RidesofferTests(unittest.TestCase):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(len(response_data), 0)
 
-    def test_post_join_ride(self):
+    def test_user_can_join_a_ride(self):
         """test user can join a ride"""
         response = self.app.post('/api/v1/rides/1/requests',
                                  content_type='application/json')
@@ -111,7 +109,7 @@ class RidesofferTests(unittest.TestCase):
         self.assertEqual(response_data['message'],
                          "Your request has been send.")
 
-    def test_post_join_non_existing_ride_fails(self):
+    def test_user_cannot_join_a_non_existing_ride(self):
         response = self.app.post('/api/v1/rides/-1/requests',
                                  content_type='application/json')
         self.assertEqual(response.status_code, 404)
