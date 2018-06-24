@@ -89,7 +89,6 @@ class RidesofferTests(unittest.TestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.get_data().decode('utf-8'))
-        self.assertEqual(len(response_data), 1)
         self.assertEqual(response_data['id'], 1)
 
     def test_user_cannot_get_ride_that_does_not_exist(self):

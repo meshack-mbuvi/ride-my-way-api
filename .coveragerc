@@ -5,4 +5,5 @@ omit = */python?.?/*
     */tests/*
     */instance/*
     *__init__.*
+    /*models*/
 show_missing = True
