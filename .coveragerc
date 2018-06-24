@@ -3,3 +3,6 @@ omit = */python?.?/*
     */site-packages/*
     */usr/*
     */tests/*
+    */instance/*
+    *__init__.*
+show_missing = True
