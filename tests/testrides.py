@@ -97,6 +97,7 @@ class RidesofferTests(unittest.TestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 404)
         response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data['message'], 'Ride does not exist')
 
     def test_user_can_join_a_ride(self):
         """test user can join a ride"""
