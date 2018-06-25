@@ -4,6 +4,9 @@
 Ride-my-way App is a carpooling application that provides drivers with the ability to create ride offers and passengers to join the ride offers.
 
 # Api endpoints:
+| Endpoint | Description |
+| --- | --- |
+| POST /api/v1/rides/{ride_id}/requests | Request to join a ride offer
 
 
 # Getting started
