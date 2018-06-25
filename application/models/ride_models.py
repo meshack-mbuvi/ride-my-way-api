@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 class RideOffer(object):
     """Model of a ride offer
     start point: String location of the driver,
@@ -12,7 +15,8 @@ class RideOffer(object):
         self.start_point = data['start point']
         self.destination = data['destination']
         self.route = data['route']
-        self.start_time = data['start time']
+        self.start_time = datetime.strptime(data['start time'],
+                                            '%B %d %Y %I:%M%p')
         self.available_space = data['available space']
         self.requests = []
 
