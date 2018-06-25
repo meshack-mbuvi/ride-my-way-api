@@ -11,10 +11,27 @@ class RidesofferTests(unittest.TestCase):
 
         self.app = create_app('testing')
         self.app = self.app.test_client()
+        self.ride = {
+            "start point": "Witeithye",
+            "destination": "Ngara",
+            "route": "Thika superhighway",
+            "start time": "June 10 2018 6:00AM",
+            "available space": 10
+        }
+
+        self.past_ride = {
+            "start point": "Witeithye",
+            "destination": "Ngara",
+            "route": "Thika superhighway",
+            "start time": "June 10 1900 6:00AM",
+            "available space": 10
+        }
 
     def tearDown(self):
         """Release flask app instance"""
         self.app = None
+        self.ride = None
+        self.past_ride = None
 
     def test_create_ride(self):
         """test user can create a ride"""
@@ -67,7 +84,7 @@ class RidesofferTests(unittest.TestCase):
             "destination": "Ngara",
             "route": "Thika superhighway",
             "start time": "June 10 2018 6:00AM",
-            "available space": "10"
+            "available space": "Ten"
         }
         response = self.app.post('/api/v1/rides',
                                  data=json.dumps(ride),
@@ -83,33 +100,51 @@ class RidesofferTests(unittest.TestCase):
                                 content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
-    def test_user_can_get_a_ride(self):
+    def test_get_a_ride(self):
         """test user can get a single ride offer"""
+        # Create a ride offer
+        self.app.post('/api/v1/rides',
+                      data=json.dumps(self.ride),
+                      content_type='application/json')
+        # Get ana offer, assuming the order is assigned id=1
         response = self.app.get('/api/v1/rides/1',
                                 content_type='application/json')
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['id'], 1)
 
-    def test_user_cannot_get_ride_that_does_not_exist(self):
+    def test_get_ride_that_does_not_exist(self):
         """Assumes no ride with a negative id number"""
-        response = self.app.get('/api/v1/rides/-1',
+        id = -1
+        response = self.app.get('/api/v1/rides/{}'.format(id),
                                 content_type='application/json')
         self.assertEqual(response.status_code, 404)
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'], 'Ride does not exist')
 
-    def test_user_can_join_a_ride(self):
+    def test_user_can_request_a_ride(self):
         """test user can join a ride"""
         response = self.app.post('/api/v1/rides/1/requests',
                                  content_type='application/json')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],
                          "Your request has been send.")
 
-    def test_user_cannot_join_a_non_existing_ride(self):
+    def test_user_cannot_request_a_non_existing_ride(self):
         response = self.app.post('/api/v1/rides/-1/requests',
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 404)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data['message'],
+                         "That ride does not exist")
+
+    def test_user_cannot_request_a_past_ride(self):
+        """Create a past ride and request to join it.It should fail"""
+        self.app.post('/api/v1/rides',
+                      data=json.dumps(self.past_ride),
+                      content_type='application/json')
+        response = self.app.post('/api/v1/rides/1/requests',
                                  content_type='application/json')
         self.assertEqual(response.status_code, 404)
         response_data = json.loads(response.get_data().decode('utf-8'))
