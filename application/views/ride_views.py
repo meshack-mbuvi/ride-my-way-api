@@ -7,14 +7,7 @@ api = Namespace('Ride offers', Description='Operations on Rides')
 
 # data structure to store ride offers
 
-rides = {1: {
-    "destination": "Nairobi",
-    "route": "Thika",
-    "start_point": "Thika",
-    "start_time": "June 01 1990 09:00AM",
-    "requests": [],
-    "available_space": 10}
-}
+rides = {}
 
 ride = api.model('Ride offer', {
     'start point': fields.String(description='location of the driver'),
@@ -33,6 +26,13 @@ class Rides(Resource):
     @api.doc('list of rides', responses={200: 'OK'})
     def get(self):
         """Retrieves all available rides"""
-        return (rides)
+        available_rides = {}
+        for key, value in rides.items():
+            if value['start_time'] <= datetime.now():
+                # convert to date to string
+                value['start_time'] = datetime.strftime(
+                    value['start_time'], '%B %d %Y %I:%M%p')
+                available_rides[key] = value
+        return (available_rides)
 
 api.add_resource(Rides, '/rides')
