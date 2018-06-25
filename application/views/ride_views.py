@@ -28,7 +28,7 @@ class Rides(Resource):
         """Retrieves all available rides"""
         available_rides = {}
         for key, value in rides.items():
-            if value['start_time'] <= datetime.now():
+            if value['start_time'] >= datetime.now():
                 # convert to date to string
                 value['start_time'] = datetime.strftime(
                     value['start_time'], '%B %d %Y %I:%M%p')
