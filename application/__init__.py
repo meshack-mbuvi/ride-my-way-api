@@ -17,10 +17,10 @@ def create_app(config):
               description='Ride-my-way App is a carpooling application \
               that provides drivers with the ability to create ride offers \
               and passengers to join the ride offers.')
+    doc = ('/api/v1/documentation')
 
     from application.views.ride_views import api as rides
     # Blueprints to be registered here
-    doc='/api/v1/documentation')
-    
+
     api.add_namespace(rides, path='/api/v1')
     return app
