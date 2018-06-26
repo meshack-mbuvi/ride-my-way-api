@@ -152,31 +152,7 @@ class RidesofferTests(unittest.TestCase):
         self.assertEqual(response_data['message'],
                          "The ride requested has already expired")
 
-    def test_user_can_view_user_requests_to_join_a_ride(self):
-        """Test users can view users requests to join a ride offer."""
-        # Create an offer
-        response = self.app.post('/api/v1/rides',
-                                 data=json.dumps(self.ride),
-                                 content_type='application/json')
-        # request to join the ride
-        response_data = json.loads(response.get_data().decode('utf-8'))
-        ride_id = int(response_data['offer id'])
-        self.app.post('/api/v1/rides/{}/requests' . format(ride_id),
-                      content_type='application/json')
-        # view user requests
-        response = self.app.get('/api/v1/rides/{}/requests' . format(ride_id),
-                                content_type='application/json')
-        self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.get_data().decode('utf-8'))
-        self.assertIn('requests', response_data)
-
-    def test_user_cannot_view_user_requests_for_non_existing_offer(self):
-        """test user cannot view user requests for non existing ride offer. """
-        response = self.app.get('/api/v1/rides/{}/requests' . format(-1),
-                                content_type='application/json')
-        self.assertEqual(response.status_code, 404)
-        response_data = json.loads(response.get_data().decode('utf-8'))
-        self.assertNotIn('requests', response_data)
+    
 
 
 if __name__ == '__main__':
