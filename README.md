@@ -1,5 +1,5 @@
 # ride-my-way-api
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/meshack-mbuvi/ride-my-way-api.svg?branch=develop)](https://travis-ci.org/meshack-mbuvi/ride-my-way-api) [![Coverage Status](https://coveralls.io/repos/github/meshack-mbuvi/ride-my-way-api/badge.svg?branch=master)](https://coveralls.io/github/meshack-mbuvi/ride-my-way-api?branch=develop)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/meshack-mbuvi/ride-my-way-api.svg?branch=develop)](https://travis-ci.org/meshack-mbuvi/ride-my-way-api) [![Coverage Status](https://coveralls.io/repos/github/meshack-mbuvi/ride-my-way-api/badge.svg?branch=develop)](https://coveralls.io/github/meshack-mbuvi/ride-my-way-api?branch=develop)
 
 Ride-my-way App is a carpooling application that provides drivers with the ability to create ride offers and passengers to join the ride offers.
 
