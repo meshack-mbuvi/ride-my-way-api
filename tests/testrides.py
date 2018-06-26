@@ -152,8 +152,6 @@ class RidesofferTests(unittest.TestCase):
         self.assertEqual(response_data['message'],
                          "The ride requested has already expired")
 
-    
-
 
 if __name__ == '__main__':
     unittest.main()
