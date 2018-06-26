@@ -8,6 +8,7 @@ Ride-my-way App is a carpooling application that provides drivers with the abili
 | Endpoint | Description |
 | --- | --- |
 | POST /api/v1/rides | Add a new ride offer
+| GET /api/v1/rides | retrieve all rides
 
 
 # Getting started
