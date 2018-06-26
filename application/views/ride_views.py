@@ -44,7 +44,7 @@ class JoinRide(Resource):
             return {'message': 'That ride does not exist'}, 404
 
 
-api.add_resource(JoinRide, '/rides/<string:ride_id>/requests')
+api.add_resource(JoinRide, '/rides/<ride_id>/requests')
 
 
 class Rides(Resource):
