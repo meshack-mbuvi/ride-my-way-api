@@ -23,7 +23,7 @@ ride = api.model('Ride offer', {
 
 
 class Rides(Resource):
-  
+
     @api.doc(responses={'message': 'ride offer added successfully.',
                         201: 'Created', 400: 'BAD FORMAT'})
     @api.expect(ride)

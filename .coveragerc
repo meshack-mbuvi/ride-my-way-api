@@ -7,3 +7,4 @@ omit = */python?.?/*
     *__init__.*
     /*models*/
 show_missing = True
+

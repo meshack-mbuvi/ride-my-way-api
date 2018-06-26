@@ -170,7 +170,7 @@ class RidesofferTests(unittest.TestCase):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertIn('requests', response_data)
 
-    def test_user_cannot_view_user_requests_for_no_existind_offer(self):
+    def test_user_cannot_view_user_requests_for_non_existing_offer(self):
         """test user cannot view user requests for non existing ride offer. """
         response = self.app.get('/api/v1/rides/{}/requests' . format(-1),
                                 content_type='application/json')
