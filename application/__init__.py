@@ -20,5 +20,7 @@ def create_app(config):
 
     from application.views.ride_views import api as rides
     # Blueprints to be registered here
+    doc='/api/v1/documentation')
+    
     api.add_namespace(rides, path='/api/v1')
     return app

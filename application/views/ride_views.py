@@ -6,7 +6,6 @@ from datetime import datetime
 api = Namespace('Ride offers', Description='Operations on Rides')
 
 # data structure to store ride offers
-
 rides = {}
 
 ride = api.model('Ride offer', {
@@ -36,3 +35,22 @@ class Rides(Resource):
         return (available_rides)
 
 api.add_resource(Rides, '/rides')
+
+
+class SingleRide(Resource):
+
+    @api.doc('Get single ride offer',
+             params={'ride_id': 'Id for a single ride offer'},
+             responses={200: 'OK', 404: 'NOT FOUND'})
+    def get(self, ride_id):
+        """Retrieves a single ride offer."""
+        try:
+            ride = rides[int(ride_id)]
+            ride['id'] = int(ride_id)
+            return jsonify(ride)
+        except Exception as e:
+            return {'message': 'Ride does not exist'}, 404
+
+
+api.add_resource(SingleRide, '/rides/<string:ride_id>')
+
