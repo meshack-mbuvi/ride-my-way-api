@@ -1,5 +1,5 @@
 # ride-my-way-api
-[![Build Status](https://travis-ci.org/meshack-mbuvi/ride-my-way-api.svg?branch=master)](https://travis-ci.org/meshack-mbuvi/ride-my-way-api) [![Build Status](https://travis-ci.org/meshack-mbuvi/ride-my-way-api.svg?branch=master)](https://travis-ci.org/meshack-mbuvi/ride-my-way-api)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Build Status](https://travis-ci.org/meshack-mbuvi/ride-my-way-api.svg?branch=master)](https://travis-ci.org/meshack-mbuvi/ride-my-way-api) [![Build Status](https://travis-ci.org/meshack-mbuvi/ride-my-way-api.svg?branch=master)](https://travis-ci.org/meshack-mbuvi/ride-my-way-api)
 
 Ride-my-way App is a carpooling application that provides drivers with the ability to create ride offers and passengers to join the ride offers.
 
@@ -7,6 +7,11 @@ Ride-my-way App is a carpooling application that provides drivers with the abili
 | Endpoint | Description |
 | --- | --- |
 | POST /api/v1/rides/{ride_id}/requests | Request to join a ride offer
+
+| Endpoint | Description |
+| --- | --- |
+| POST /api/v1/rides | Add a new ride offer
+| GET /api/v1/rides | retrieve all rides
 
 
 # Getting started
