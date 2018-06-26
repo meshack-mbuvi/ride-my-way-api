@@ -20,6 +20,23 @@ ride = api.model('Ride offer', {
 })
 
 
+class Rides(Resource):
+
+    @api.doc('list of rides', responses={200: 'OK'})
+    def get(self):
+        """Retrieves all available rides"""
+        available_rides = {}
+        for key, value in rides.items():
+            if value['start_time'] >= datetime.now():
+                # convert to date to string
+                value['start_time'] = datetime.strftime(
+                    value['start_time'], '%B %d %Y %I:%M%p')
+                available_rides[key] = value
+        return (available_rides)
+
+api.add_resource(Rides, '/rides')
+
+
 class SingleRide(Resource):
 
     @api.doc('Get single ride offer',
@@ -36,3 +53,4 @@ class SingleRide(Resource):
 
 
 api.add_resource(SingleRide, '/rides/<string:ride_id>')
+
