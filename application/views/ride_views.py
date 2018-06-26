@@ -53,6 +53,7 @@ class Rides(Resource):
                         201: 'Created', 400: 'BAD FORMAT'})
     @api.expect(ride)
     def post(self):
+        """creates a new ride offer."""
         data = request.get_json()
         # Check whether there is data
         if any(data):
