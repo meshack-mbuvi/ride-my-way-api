@@ -1,15 +1,23 @@
 from flask import Flask, Blueprint
 from flask_restplus import Api
+from flask_jwt_extended import JWTManager
+
 from instance.config import configuration
+from application.manage import db as database
+
+from application.models import create_all
+
+db = database
 
 
-def create_app(config):
+def create_app(config, database=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(configuration[config])
     app.url_map.strict_slashes = False
 
     # Enable swagger editor
     app.config['SWAGGE_UI_JSNEDITOR'] = True
+
     # initialize api
     api = Api(app=app,
               title='Ride My Way',
@@ -19,8 +27,20 @@ def create_app(config):
               and passengers to join the ride offers.')
     doc = ('/api/v1/documentation')
 
-    from application.views.ride_views import api as rides
-    # Blueprints to be registered here
+    jwt = JWTManager(app)
+    from application.views import blacklist
 
+    @jwt.token_in_blacklist_loader
+    def check_if_token_in_blacklist(decrypted_token):
+        jti = decrypted_token['jti']
+        return jti in blacklist
+
+    from application.views.ride_views import api as rides
+    from application.views.user_views import api as user
+    # Blueprints to be registered here
     api.add_namespace(rides, path='/api/v1')
+    api.add_namespace(user, path='/api/v1')
+
+    # create tables
+    create_all()
     return app
