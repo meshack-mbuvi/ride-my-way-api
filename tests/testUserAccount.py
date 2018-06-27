@@ -68,7 +68,8 @@ class SignTests(unittest.TestCase):
     def test_user_cannot_sign_up_with_unmatching_passwords(self):
         """tests user cannot sign up with unmatching passwords."""
         response = self.app.post('/api/v1/auth/signup',
-                                 data=json.dumps(self.data_with_unmatching_passwords),
+                                 data=json.dumps(
+                                     self.data_with_unmatching_passwords),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.get_data().decode('utf-8'))
@@ -101,7 +102,8 @@ class SignTests(unittest.TestCase):
     def test_user_cannot_sign_up_with_empty_passwords(self):
         """tests user cannot sign up with empty fields."""
         response = self.app.post('/api/v1/auth/signup',
-                                 data=json.dumps(self.data_with_empty_password),
+                                 data=json.dumps(
+                                     self.data_with_empty_password),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.get_data().decode('utf-8'))
@@ -193,6 +195,22 @@ class LoginTests(unittest.TestCase):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response_data['message'], 'User not found.')
+
+    def test_user_can_logout(self):
+        """test user can logout"""
+        # log in user first to get token
+        response = self.app.post('/api/v1/auth/login',
+                                 data=json.dumps(self.valid_user),
+                                 content_type='application/json')
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        # get token
+        token = received_data['token']
+        # logout
+        response = self.app.post('/api/v1/auth/logout', headers={'content_type': 'application/json',
+                                                                 'Authorization': 'Bearer {}'.format(token)})
+        received_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(received_data[
+                         'message'], "Successfully logged out", msg="User should be logged out")
 
 
 if __name__ == '__main__':
