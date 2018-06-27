@@ -34,17 +34,20 @@ class JoinRide(Resource):
             username = 'Meshack Mbuvi'
             # check whether ride offer is expired
             ride = rides[int(ride_id)]
-            if ride['start_time'] >= datetime.now():
+            # if ride['start_time'] >= datetime.now():
+            requests = len(ride['requests'])
+            if requests < (ride['available_space']):
                 ride['requests'].append(username)
                 return {'message': 'Your request has been send.'}, 201
             else:
                 return {'message':
-                        'The ride requested has already expired'}, 403
+                        'The ride has no available space'}, 403
         except Exception as e:
+            print(e)
             return {'message': 'That ride does not exist'}, 404
 
 
-api.add_resource(JoinRide, '/rides/<ride_id>/requests')
+api.add_resource(JoinRide, '/rides/<string:ride_id>/requests')
 
 
 class Rides(Resource):
@@ -64,7 +67,8 @@ class Rides(Resource):
                 # set id for the ride offer
                 ride_offer = RideOffer(data)
                 offer_id = len(rides) + 1
-                rides[offer_id] = ride_offer.getDict()
+                # print(len(rides))
+                rides[(offer_id)] = ride_offer.getDict()
                 response = {'message': 'ride offer added successfully.',
                             'offer id': offer_id}
                 return response, 201
@@ -78,11 +82,11 @@ class Rides(Resource):
         """Retrieves all available rides"""
         available_rides = {}
         for key, value in rides.items():
-            if value['start_time'] >= datetime.now():
+            # if value['start_time'] >= datetime.now():
                 # convert to date to string
-                value['start_time'] = datetime.strftime(
-                    value['start_time'], '%B %d %Y %I:%M%p')
-                available_rides[key] = value
+            value['start_time'] = datetime.strftime(
+                value['start_time'], '%B %d %Y %I:%M%p')
+            available_rides[key] = value
         return (available_rides)
 
 api.add_resource(Rides, '/rides')
