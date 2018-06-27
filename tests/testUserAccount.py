@@ -124,6 +124,8 @@ class LoginTests(unittest.TestCase):
 
         self.app = create_app('testing')
         self.app = self.app.test_client()
+        self.db = database()
+        self.db.create_all()
 
         self.user_data = {
             "email": "meshmbuvi@gmail.com",
@@ -160,10 +162,8 @@ class LoginTests(unittest.TestCase):
 
     def tearDown(self):
         self.app = None
-        con = connect(database=dbname, user=user, host=host, password=password)
-        con.autocommit = True
-        cur = con.cursor()
-        cur.execute("DELETE from users ")
+        self.db = database()
+        self.db.create_all()
 
     def test_user_can_login(self):
         """tests user can log in"""
