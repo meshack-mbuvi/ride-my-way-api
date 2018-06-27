@@ -22,7 +22,7 @@ class SignTests(unittest.TestCase):
             "phone": "0719800509",
             "confirm password": "mbuvi1"
         }
-        self.passwords = {
+        self.data_with_unmatching_passwords = {
             "email": "meshmbuvi@gmail.com",
             "username": "mbuvi1",
             "driver": False,
@@ -30,7 +30,7 @@ class SignTests(unittest.TestCase):
             "phone": "0719800509",
             "confirm password": "mbuvi11"
         }
-        self.email = {
+        self.data_with_invali_email = {
             "email": "meshmbuvi",
             "username": "mbuvi1",
             "driver": False,
@@ -38,15 +38,7 @@ class SignTests(unittest.TestCase):
             "phone": "0719800509",
             "confirm password": "mbuvi1"
         }
-        self.conflict_username = {
-            "email": "meshmbuvi@gmail.com",
-            "username": "mbuvi",
-            "driver": False,
-            "password": "mbuvi1",
-            "phone": "0719800509",
-            "confirm password": "mbuvi1"
-        }
-        self.empty_password = {
+        self.data_with_empty_password = {
             "email": "meshmbuvi@gmail.com",
             "username": "mbuvi",
             "driver": True,
@@ -76,7 +68,7 @@ class SignTests(unittest.TestCase):
     def test_user_cannot_sign_up_with_unmatching_passwords(self):
         """tests user cannot sign up with unmatching passwords."""
         response = self.app.post('/api/v1/auth/signup',
-                                 data=json.dumps(self.passwords),
+                                 data=json.dumps(self.data_with_unmatching_passwords),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.get_data().decode('utf-8'))
@@ -86,7 +78,7 @@ class SignTests(unittest.TestCase):
     def test_user_cannot_sign_up_with_invalid_email(self):
         """tests user cannot sign up with invalid email."""
         response = self.app.post('/api/v1/auth/signup',
-                                 data=json.dumps(self.email),
+                                 data=json.dumps(self.data_with_invali_email),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.get_data().decode('utf-8'))
@@ -109,7 +101,7 @@ class SignTests(unittest.TestCase):
     def test_user_cannot_sign_up_with_empty_passwords(self):
         """tests user cannot sign up with empty fields."""
         response = self.app.post('/api/v1/auth/signup',
-                                 data=json.dumps(self.empty_password),
+                                 data=json.dumps(self.data_with_empty_password),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.get_data().decode('utf-8'))
@@ -155,7 +147,7 @@ class LoginTests(unittest.TestCase):
             "password": "mbuvi1"
         }
         self.user_not_exist = {
-            "email": "meshmbuvi@gmail.com",
+            "email": "meshmbuvi@gmail.comdsghdfdhg",
             "username": "mutadbkjdhgksjdg",
             "password": "mbuvi1"
         }
