@@ -5,9 +5,9 @@ from . import *
 
 
 def createTable(table_name):
-    cur = con.cursor()
+    cursor = connection.cursor()
     try:
-        cur.execute('SELECT 1 from {}' . format(table_name))
+        cursor.execute('SELECT 1 from {}' . format(table_name))
         return True
     except Exception as e:
         commands = 'CREATE TABLE users (user_id serial PRIMARY KEY, \
@@ -15,7 +15,7 @@ def createTable(table_name):
                         email varchar(50) NOT NULL, \
                         password varchar(255) NOT NULL, \
                         phone varchar(255) NOT NULL, driver boolean )'
-        cur.execute(commands)
+        cursor.execute(commands)
 
         return False
 
@@ -35,5 +35,5 @@ class User():
         query = "INSERT INTO users (username,email,password,phone,driver) VALUES " \
             "('" + self.username + "', '" + self.email + "', '" + self.password + "', \
              {},{})". format(self.phone, self.driver)
-        cur.execute(query)
-        con.commit()
+        cursor.execute(query)
+        connection.commit()

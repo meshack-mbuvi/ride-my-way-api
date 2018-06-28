@@ -2,7 +2,7 @@ import json
 import unittest
 from psycopg2 import connect
 
-from application import create_app, db as database
+from application import create_app, database
 from application.models import dbname, user, host, password
 
 
