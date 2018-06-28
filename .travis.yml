@@ -15,7 +15,7 @@ before_script:
   - psql -c "CREATE DATABASE ridemyway;" -U postgres
 
 script: 
-  - nosetests --with-coverage
+  - nosetests tests/testUserAccount.py --with-coverage
 
 after_success:
   - coveralls
