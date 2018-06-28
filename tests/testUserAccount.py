@@ -2,7 +2,7 @@ import json
 import unittest
 from psycopg2 import connect
 
-from application import create_app, db as database
+from application import create_app, database
 from application.models import dbname, user, host, password
 
 
@@ -14,7 +14,7 @@ class SignTests(unittest.TestCase):
         self.app = create_app('testing')
         self.app = self.app.test_client()
 
-        self.user_data = {
+        self.userData = {
             "email": "meshmbuvi@gmail.com",
             "username": "musyoka",
             "driver": True,
@@ -66,7 +66,7 @@ class SignTests(unittest.TestCase):
     def test_user_can_sign_up(self):
         """tests user can create an account."""
         response = self.app.post('/api/v1/auth/signup',
-                                 data=json.dumps(self.user_data),
+                                 data=json.dumps(self.userData),
                                  content_type='application/json')
 
         response_data = json.loads(response.get_data().decode('utf-8'))
@@ -98,10 +98,10 @@ class SignTests(unittest.TestCase):
     def test_user_cannot_sign_up_twice(self):
         """tests user cannot sign up twice."""
         self.app.post('/api/v1/auth/signup',
-                      data=json.dumps(self.user_data),
+                      data=json.dumps(self.userData),
                       content_type='application/json')
         response = self.app.post('/api/v1/auth/signup',
-                                 data=json.dumps(self.user_data),
+                                 data=json.dumps(self.userData),
                                  content_type='application/json')
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 409)
