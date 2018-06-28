@@ -31,7 +31,6 @@ ride = api.model('Ride offer', {
 })
 
 
-# create and retrieve ride offers
 class Rides(Resource):
 
     @api.doc(responses={'message': 'ride offer added successfully.',
@@ -54,7 +53,6 @@ class Rides(Resource):
                 ride_offer = RideOffer(data)
                 # save data here
                 offer_id = ride_offer.save(current_user)
-                # ride_offer.save()
                 response = {'message': 'ride offer added successfully.',
                             'offer id': offer_id}
                 return response, 201
