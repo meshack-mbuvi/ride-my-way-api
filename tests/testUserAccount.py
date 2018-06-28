@@ -47,6 +47,15 @@ class SignTests(unittest.TestCase):
             "confirm password": ""
         }
 
+        self.data_with_short_password = {
+            "email": "meshmbuvi@gmail.com",
+            "username": "mbuvi",
+            "driver": True,
+            "password": "mfcf",
+            "phone": "0719800509",
+            "confirm password": "mfcf"
+        }
+
         self.db = database()
         self.db.create_all()
 
@@ -109,6 +118,17 @@ class SignTests(unittest.TestCase):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],
                          'All fields are required.')
+
+    def test_password_cannot_be_less_than_six_characters(self):
+        """tests user cannot sign up with empty fields."""
+        response = self.app.post('/api/v1/auth/signup',
+                                 data=json.dumps(
+                                     self.data_with_short_password),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data['message'],
+                         'password should be 6 characters or more.')
 
 if __name__ == '__main__':
     unittest.main()

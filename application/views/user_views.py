@@ -40,6 +40,9 @@ class UserSignUp(Resource):
         if username == "" or email == "" or phone == "" or confirm_password == "" or password == "":
             return {"message": "All fields are required."}, 400
 
+        if len(password) < 6:
+            return {'message': 'password should be 6 characters or more.'}, 400
+
         if not validate_email(email):
             return {"message": "Email is invalid"}, 400
 
