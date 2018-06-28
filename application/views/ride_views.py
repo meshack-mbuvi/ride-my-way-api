@@ -32,21 +32,8 @@ ride = api.model('Ride offer', {
 })
 
 
-# create and retrieve ride offers
-class Rides(Resource):
 
-    def isdriver(self, user):
-        """checks whether user with provided username is a driver.
-        :arg
-            username (str): parameter to be considered.
-        :returns
-            True for driver, False for non-drivers.
-        """
-        # if user.admin:
-        #     return True
-        # else:
-        #     return False
-        pass
+class Rides(Resource):
 
     @api.doc(responses={'message': 'ride offer added successfully.',
                         201: 'Created', 400: 'BAD FORMAT', 401: 'UNAUTHORIZED'})
@@ -67,7 +54,7 @@ class Rides(Resource):
                 ride_offer = RideOffer(data)
                 # save data here
                 offer_id = ride_offer.save(current_user)
-                # ride_offer.save()
+
                 response = {'message': 'ride offer added successfully.',
                             'offer id': offer_id}
                 return response, 201
@@ -75,6 +62,4 @@ class Rides(Resource):
                 return {'message': 'use correct format for date and time.'}, 400
         else:
             return {'message': 'make sure you provide all required fields.'}, 400
-
-
 api.add_resource(Rides, '/users/rides')
