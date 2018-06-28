@@ -14,7 +14,7 @@ class SignTests(unittest.TestCase):
         self.app = create_app('testing')
         self.app = self.app.test_client()
 
-        self.userData = {
+        self.user_data = {
             "email": "meshmbuvi@gmail.com",
             "username": "musyoka",
             "driver": True,
