@@ -77,4 +77,19 @@ class Rides(Resource):
             return {'message': 'make sure you provide all required fields.'}, 400
 
 
+class AllRides(Resource):
+
+    @api.doc('Get Available rides',
+             params={'ride_id': 'Id for a single ride offer'},
+             responses={200: 'OK', 404: 'NOT FOUND'})
+    @jwt_required
+    def get(self):
+        """Retrieves all available rides"""
+        query = "SELECT * from rides"
+        cursor.execute(query)
+        return jsonify([{'id': i[0], 'start point': i[2], 'destination':
+                         i[3], 'start_time': i[4], 'route': i[5], 'available space': i[6]} for i in cursor.fetchall()])
+
+
 api.add_resource(Rides, '/users/rides')
+api.add_resource(AllRides, '/rides')
