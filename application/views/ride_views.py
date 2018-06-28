@@ -88,8 +88,35 @@ class AllRides(Resource):
         query = "SELECT * from rides"
         cursor.execute(query)
         return jsonify([{'id': i[0], 'start point': i[2], 'destination':
-                         i[3], 'start_time': i[4], 'route': i[5], 'available space': i[6]} for i in cursor.fetchall()])
+                         i[3], 'start_time': i[4], 'route': i[5],
+                         'available space': i[6]} for i in cursor.fetchall()])
 
+
+class SingleRide(Resource):
+
+    @api.doc('Get single ride offer',
+             params={'ride_id': 'Id for a single ride offer'},
+             responses={200: 'OK', 404: 'NOT FOUND'})
+    @jwt_required
+    def get(self, ride_id):
+        """Retrieves a single ride offer."""
+        try:
+            # ride['id'] = int(ride_id)
+            query = "SELECT * from rides where ride_id = '{}' " . format(
+                ride_id)
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            if len(rows) > 0:
+                return jsonify(
+                    [{'id': i[0], 'start point': i[2], 'destination': i[3],
+                      'start_time': i[4], 'route': i[5],
+                      'available space': i[6]} for i in rows])
+            else:
+                return {'message': 'Ride does not exist'}, 404
+        except Exception as e:
+            return {'message': 'we are experiencing difficulties \
+            responding to your query'}
 
 api.add_resource(Rides, '/users/rides')
 api.add_resource(AllRides, '/rides')
+api.add_resource(SingleRide, '/rides/<string:ride_id>')
