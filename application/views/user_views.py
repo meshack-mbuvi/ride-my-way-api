@@ -63,4 +63,49 @@ class UserSignUp(Resource):
         except Exception as e:
             return {'message': 'We are unable to create your account at the moment.'}, 404
 
+# model for login
+model_login = api.model('Login', {'email': fields.String,
+                                  'password': fields.String})
+
+
+class UserLogin(Resource):
+
+    @api.doc('user accounts', responses={201: 'CREATED', 400: 'BAD REQUEST', 401:'INVALID CREDENTIALS',404: 'NOT FOUND'})
+    @api.expect(model_login)
+    def post(self):
+        """User login
+        :returns JWT after successful login
+        """
+
+        data = request.get_json()
+        username = data['username']
+        password = data['password']
+
+        if username == "" or password == "":
+            return {"message": "Invalid format."}, 400
+
+        try:
+            query = None
+            user = None
+            if 'email' in data:
+                email = data['email']
+                query = "select password from users where email='{}'". format(
+                    email)
+                cur.execute(query)
+                user = cur.fetchone()
+            else:
+                query = "select password from users where username='{}'". format(
+                    username)
+                cur.execute(query)
+                user = cur.fetchone()
+
+            if check_password_hash(user[0], password):
+                token = create_access_token(identity=username)
+                return {'message': 'logged in.', 'token': token}, 201
+            else:
+                return {'message': 'Invalid crententials.'}, 401
+        except Exception as e:
+            return {'message': 'User not found.'}, 404
+
 api.add_resource(UserSignUp, '/auth/signup')
+api.add_resource(UserLogin, '/auth/login')
