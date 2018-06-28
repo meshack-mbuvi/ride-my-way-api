@@ -14,13 +14,13 @@ usermodel = api.model('sign up', {
     'phone': fields.Integer(description='Your phone number'),
     'password': fields.String(description='Your password'),
     'confirm password': fields.String(description='confirm password'),
-    'driver': fields.Boolean(description='True if driver, False otherwise')
+    'driver': fields.Boolean(description='true if driver, false otherwise')
 })
 
 
-con = connect(database=dbname, user=user, host=host, password=password)
-con.autocommit = True
-cur = con.cursor()
+connection = connect(database=dbname, user=user, host=host, password=password)
+connection.autocommit = True
+cursor = connection.cursor()
 
 
 class UserSignUp(Resource):
@@ -29,15 +29,15 @@ class UserSignUp(Resource):
     @api.expect(usermodel)
     def post(self):
         """User sign up"""
-        data = request.get_json()
+        userData = request.get_json()
 
-        username = data['username']
-        confirm_password = data['confirm password']
-        phone = data['phone']
-        email = data['email']
-        password = data["password"]
+        username = userData['username']
+        confirmPassword = userData['confirm password']
+        phone = userData['phone']
+        email = userData['email']
+        password = userData["password"]
 
-        if username == "" or email == "" or phone == "" or confirm_password == "" or password == "":
+        if username == "" or email == "" or phone == "" or confirmPassword == "" or password == "":
             return {"message": "All fields are required."}, 400
 
         if len(password) < 6:
@@ -46,18 +46,17 @@ class UserSignUp(Resource):
         if not validate_email(email):
             return {"message": "Email is invalid"}, 400
 
-        if not password == confirm_password:
+        if not password == confirmPassword:
             return {'message': 'Passwords do not match'}, 400
 
         user = None
         try:
             query = "select username from users where username='%s'" % username
-            cur.execute(query)
-            user = cur.fetchone()
+            cursor.execute(query)
+            user = cursor.fetchone()
             if user is None:
-                data = request.get_json()
-                user_object = User(data)
-                user_object.save()
+                userObject = User(userData)
+                userObject.save()
                 return {'message': 'Account created.'}, 201
             return {'message': 'User exists.'}, 409
         except Exception as e:
@@ -77,27 +76,25 @@ class UserLogin(Resource):
         :returns JWT after successful login
         """
 
-        data = request.get_json()
-        username = data['username']
-        password = data['password']
+        userData = request.get_json()
+        username = userData['username']
+        password = userData['password']
 
         if username == "" or password == "":
             return {"message": "Invalid format."}, 400
 
         try:
-            query = None
-            user = None
-            if 'email' in data:
-                email = data['email']
+            if 'email' in userData:
+                email = userData['email']
                 query = "select password from users where email='{}'". format(
                     email)
-                cur.execute(query)
-                user = cur.fetchone()
+                cursor.execute(query)
+                user = cursor.fetchone()
             else:
                 query = "select password from users where username='{}'". format(
                     username)
-                cur.execute(query)
-                user = cur.fetchone()
+                cursor.execute(query)
+                user = cursor.fetchone()
 
             if check_password_hash(user[0], password):
                 token = create_access_token(identity=username)

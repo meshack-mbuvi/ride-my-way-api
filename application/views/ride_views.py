@@ -1,13 +1,22 @@
-from flask_restplus import Resource, Namespace, fields
-from flask import request, jsonify
-from datetime import datetime
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from psycopg2 import connect
 
+from . import *
+dbname = 'ridemyway'
+user = 'ridemyway'
+host = 'localhost'
+password = 'ridemyway'
+
+connection = connect(database=dbname, user=user, host=host, password=password)
+connection.autocommit = True
+cursor = connection.cursor()
 
 from application.models.ride_models import RideOffer
 
 api = Namespace('Ride offers', Description='Operations on Rides')
 
 # data structure to store ride offers
+
 rides = {}
 
 ride = api.model('Ride offer', {
@@ -15,46 +24,39 @@ ride = api.model('Ride offer', {
     'destination': fields.String(description='end-point of the journey'),
     'route': fields.String(description='ordered roads driver is going \
          to use'),
-    'start time': fields.Date(description='Format:(Month Day Year Hr:MinAM/PM). time \
+    'start time': fields.DateTime(dt_format='iso8601',
+                                  description='Format:(Year Month Day Hr:MinAM/PM). time \
      driver starts the ride.'),
     'available space': fields.Integer(
         description='available space for passengers')
 })
 
 
-class JoinRide(Resource):
-
-    @api.doc('Request to join a ride offer',
-             params={'ride_id': 'Id for offer user is requesting to join'},
-             responses={201: 'CREATED', 404: 'NOT FOUND', 403: 'FORBIDEN'})
-    def post(self, ride_id):
-        """Sends user request to join a ride offer"""
-        try:
-            # sample user
-            username = 'Meshack Mbuvi'
-            # check whether ride offer is expired
-            ride = rides[int(ride_id)]
-            if ride['start_time'] >= datetime.now():
-                ride['requests'].append(username)
-                return {'message': 'Your request has been send.'}, 201
-            else:
-                return {'message':
-                        'The ride requested has already expired'}, 403
-        except Exception as e:
-            return {'message': 'That ride does not exist'}, 404
-
-
-api.add_resource(JoinRide, '/rides/<ride_id>/requests')
-
-
+# create and retrieve ride offers
 class Rides(Resource):
 
+    def isdriver(self, user):
+        """checks whether user with provided username is a driver.
+        :arg
+            username (str): parameter to be considered.
+        :returns
+            True for driver, False for non-drivers.
+        """
+        # if user.admin:
+        #     return True
+        # else:
+        #     return False
+        pass
+
     @api.doc(responses={'message': 'ride offer added successfully.',
-                        201: 'Created', 400: 'BAD FORMAT'})
+                        201: 'Created', 400: 'BAD FORMAT', 401: 'UNAUTHORIZED'})
     @api.expect(ride)
+    @api.header('Authorization', 'Some expected header', required=True)
+    @jwt_required
     def post(self):
-        """creates a new ride offer."""
+        """Creates a new ride offer"""
         data = request.get_json()
+        current_user = get_jwt_identity()
         # Check whether there is data
         if any(data):
             # save ride to data structure
@@ -63,8 +65,9 @@ class Rides(Resource):
             try:
                 # set id for the ride offer
                 ride_offer = RideOffer(data)
-                offer_id = len(rides) + 1
-                rides[offer_id] = ride_offer.getDict()
+                # save data here
+                offer_id = ride_offer.save(current_user)
+                # ride_offer.save()
                 response = {'message': 'ride offer added successfully.',
                             'offer id': offer_id}
                 return response, 201
@@ -73,34 +76,5 @@ class Rides(Resource):
         else:
             return {'message': 'make sure you provide all required fields.'}, 400
 
-    @api.doc('list of rides', responses={200: 'OK'})
-    def get(self):
-        """Retrieves all available rides"""
-        available_rides = {}
-        for key, value in rides.items():
-            if value['start_time'] >= datetime.now():
-                # convert to date to string
-                value['start_time'] = datetime.strftime(
-                    value['start_time'], '%B %d %Y %I:%M%p')
-                available_rides[key] = value
-        return (available_rides)
 
-api.add_resource(Rides, '/rides')
-
-
-class SingleRide(Resource):
-
-    @api.doc('Get single ride offer',
-             params={'ride_id': 'Id for a single ride offer'},
-             responses={200: 'OK', 404: 'NOT FOUND'})
-    def get(self, ride_id):
-        """Retrieves a single ride offer."""
-        try:
-            ride = rides[int(ride_id)]
-            ride['id'] = int(ride_id)
-            return jsonify(ride)
-        except Exception as e:
-            return {'message': 'Ride does not exist'}, 404
-
-
-api.add_resource(SingleRide, '/rides/<string:ride_id>')
+api.add_resource(Rides, '/users/rides')
