@@ -34,7 +34,6 @@ class JoinRide(Resource):
             username = 'Meshack Mbuvi'
             # check whether ride offer is expired
             ride = rides[int(ride_id)]
-            # if ride['start_time'] >= datetime.now():
             requests = len(ride['requests'])
             if requests < (ride['available_space']):
                 ride['requests'].append(username)
@@ -67,7 +66,6 @@ class Rides(Resource):
                 # set id for the ride offer
                 ride_offer = RideOffer(data)
                 offer_id = len(rides) + 1
-                # print(len(rides))
                 rides[(offer_id)] = ride_offer.getDict()
                 response = {'message': 'ride offer added successfully.',
                             'offer id': offer_id}
