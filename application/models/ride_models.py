@@ -22,8 +22,8 @@ class RideOffer(object):
 
     def save(self, current_user):
         # insert new record
-        query = "INSERT INTO rides (owner_id,startPoint,destination,startTime,\
-        route,availablePpace) \
+        query = "INSERT INTO rides (owner_id,start_point,destination,start_time,\
+        route,available_space) \
                 VALUES ((SELECT user_id from users where username ='{}'), '{}',\
                         '{}','{}','{}', '{}')" . format(current_user,
                                                         self.startPoint,

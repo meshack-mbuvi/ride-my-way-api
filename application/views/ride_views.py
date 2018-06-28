@@ -74,6 +74,7 @@ class Rides(Resource):
                             'offer id': offer_id}
                 return response, 201
             except Exception as e:
+                print(e)
                 return {'message':
                         'use correct format for date and time.'}, 400
         else:
@@ -106,18 +107,26 @@ class SingleRide(Resource):
         """Retrieves a single ride offer."""
         try:
             # ride['id'] = int(ride_id)
-            query = "SELECT * from rides where ride_id = '{}' " . format(
+            query = "SELECT rides.ride_id, rides.start_point, rides.destination,\
+            rides.route, rides.start_time, rides.available_space,\
+             users.username, users.phone\
+             from rides INNER JOIN users ON rides.ride_id = users.user_id \
+            where ride_id = '{}' \
+            " . format(
                 ride_id)
             cursor.execute(query)
             rows = cursor.fetchall()
             if len(rows) > 0:
                 return jsonify(
-                    [{'id': i[0], 'start point': i[2], 'destination': i[3],
-                      'start_time': i[4], 'route': i[5],
-                      'available space': i[6]} for i in rows])
+                    [{'id': row[0], 'start point': row[1],
+                      'destination': row[2],
+                      'route':row[3], 'start_time': row[4],
+                      'available space': row[5],
+                      'offer by ': row[6], 'phone': row[7]} for row in rows])
             else:
                 return {'message': 'Ride does not exist'}, 404
         except Exception as e:
+            print(e)
             return {'message': 'we are experiencing difficulties \
             responding to your query'}
 
