@@ -126,6 +126,19 @@ class RidesOfferTests(unittest.TestCase):
         self.assertEqual(response_data['message'],
                          "available space can only be numbers.")
 
+    def test_get_all_rides(self):
+        """test user can get available ride offers."""
+        # Create a ride offer to be sure there is an offer
+        response = self.app.post('/api/v1/users/rides',
+                                 data=json.dumps(self.ride),
+                                 content_type='application/json',
+                                 headers=self.headers)
+        response = self.app.get('/api/v1/rides/',
+                                content_type='application/json',
+                                headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertTrue(response_data[0] is not None)
 
 if __name__ == '__main__':
     unittest.main()
