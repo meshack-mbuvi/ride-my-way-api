@@ -1,4 +1,5 @@
 from datetime import datetime
+from . import *
 
 
 class RideOffer(object):
@@ -11,14 +12,26 @@ class RideOffer(object):
     requests : List holding users who request to join the ride
     """
 
-    def __init__(self, data):
-        self.start_point = data['start point']
-        self.destination = data['destination']
-        self.route = data['route']
-        self.start_time = datetime.strptime(data['start time'],
-                                            '%B %d %Y %I:%M%p')
-        self.available_space = data['available space']
-        self.requests = []
+    def __init__(self, ridedata):
+        self.startPoint = ridedata['start point']
+        self.destination = ridedata['destination']
+        date = datetime.strptime(ridedata['start time'], '%B %d %Y %I:%M%p')
+        self.startTime = datetime.strftime(date, '%B %d %Y %I:%M%p')
+        self.route = ridedata['route']
+        self.availableSpace = ridedata['available space']
 
-    def getDict(self):
-        return self.__dict__
+    def save(self, current_user):
+        # insert new record
+        query = "INSERT INTO rides (owner_id,startPoint,destination,startTime,route,availablePpace) \
+                VALUES ((SELECT user_id from users where username ='{}'), '{}',\
+                        '{}','{}','{}', '{}')" . format(current_user,
+                                                  self.startPoint,
+                                                  self.destination,
+                                                  self.startTime,
+                                                  self.route,
+                                                  self.availableSpace)
+        cursor.execute(query)
+        connection.commit()
+
+    def fetch_all(self):
+        pass
