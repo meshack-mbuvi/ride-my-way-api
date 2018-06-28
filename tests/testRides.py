@@ -138,8 +138,48 @@ class RidesOfferTests(unittest.TestCase):
                                 headers=self.headers)
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.get_data().decode('utf-8'))
-        print(response_data)
         self.assertTrue(response_data[0] is not None)
+
+    def test_user_can_request_a_ride(self):
+        """test user can join a ride."""
+        # create a ride to be sure a ride exists.
+        response = self.app.post('/api/v1/users/rides',
+                                 data=json.dumps(self.ride),
+                                 content_type='application/json',
+                                 headers=self.headers)
+        response = self.app.post('/api/v1/rides/1/requests',
+                                 content_type='application/json',
+                                 headers=self.headers)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        print(response_data)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response_data['message'],
+                         "Your request has been send.")
+
+    def test_user_cannot_request_a_non_existing_ride(self):
+        """test user cannot request a non existing ride offer."""
+        response = self.app.post('/api/v1/rides/-1/requests',
+                                 content_type='application/json',
+                                 headers=self.headers)
+        self.assertEqual(response.status_code, 404)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data['message'],
+                         "That ride does not exist")
+
+    def test_user_cannot_request_a_past_ride(self):
+        """Create a past ride and request to join it. It should fail."""
+        self.app.post('/api/v1/users/rides',
+                      data=json.dumps(self.past_ride),
+                      content_type='application/json',
+                      headers=self.headers)
+        response = self.app.post('/api/v1/rides/1/requests',
+                                 content_type='application/json',
+                                 headers=self.headers)
+        self.assertEqual(response.status_code, 403)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data['message'],
+                         "The ride requested has already expired")
+
 
 if __name__ == '__main__':
     unittest.main()

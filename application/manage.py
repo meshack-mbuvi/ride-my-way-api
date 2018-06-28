@@ -8,14 +8,16 @@ password = 'ridemyway'
 
 class database():
 
-    def connect(self):
-        connection = connect(database=dbname, user=user, host=host, password=password)
+    def connect(self, dbname):
+        dbname = dbname
+        connection = connect(database=dbname,
+                             user=user, host=host, password=password)
         connection.autocommit = True
         return connection
 
-    def create_all(self):
+    def create_all(self, dbname=dbname):
         # Create all tables here
-        connection = self.connect()
+        connection = self.connect(dbname)
         commands = (
             'DROP TABLE "users" CASCADE',
             'CREATE TABLE users (user_id serial PRIMARY KEY, \
@@ -27,12 +29,20 @@ class database():
             'DROP TABLE "rides" CASCADE',
             'CREATE TABLE rides (ride_id serial PRIMARY KEY, \
                        owner_id serial, \
-                       start_point varchar(255), \
+                       start_point varchar(255),\
                        destination varchar(255), \
                        start_time varchar(50) NOT NULL, \
                        route varchar(255) NOT NULL, \
                        available_space Int NOT NULL, \
-                       FOREIGN KEY (owner_id) REFERENCES users(user_id) )'
+                       FOREIGN KEY (owner_id) REFERENCES users(user_id) )',
+            'DROP TABLE "requests" CASCADE',
+            'CREATE TABLE requests (req_id serial PRIMARY KEY,\
+                       date_created timestamp,\
+                       owner_id serial,\
+                       user_id serial,\
+                       status boolean, \
+                       FOREIGN KEY (owner_id) REFERENCES users(user_id), \
+                       FOREIGN KEY (user_id) REFERENCES users(user_id) )'
         )
 
         try:
@@ -52,11 +62,12 @@ class database():
             if connection is not None:
                 connection.close()
 
-    def drop_all(self):
-        connection = self.connect()
+    def drop_all(self, dbname=dbname):
+        connection = self.connect(dbname)
         commands = (
             'DROP TABLE "users" CASCADE',
-            'DROP TABLE "rides" CASCADE')
+            'DROP TABLE "rides" CASCADE',
+            'DROP TABLE "requests" CASCADE')
         try:
             connection.autocommit = True
             cursor = connection.cursor()

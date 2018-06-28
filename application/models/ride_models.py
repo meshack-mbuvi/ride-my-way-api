@@ -20,12 +20,11 @@ class RideOffer(object):
         self.route = ridedata['route']
         self.availableSpace = ridedata['available space']
 
-
     def save(self, current_user):
         # insert new record
         query = "INSERT INTO rides (owner_id,start_point,destination,start_time,\
         route,available_space) \
-                VALUES ((SELECT user_id from users where username ='{}'), '{}',\
+                VALUES ((SELECT user_id from users where username ='{}'),'{}',\
                         '{}','{}','{}', '{}')" . format(current_user,
                                                         self.startPoint,
                                                         self.destination,

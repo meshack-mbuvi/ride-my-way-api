@@ -1,6 +1,7 @@
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from psycopg2 import connect
 from application.models.ride_models import RideOffer
+from datetime import datetime
 
 from . import *
 dbname = 'ridemyway'
@@ -52,9 +53,9 @@ class Rides(Resource):
                 # set id for the ride offer
                 ride_offer = RideOffer(data)
                 # save data here
-                offer_id = ride_offer.save(current_user)
+                ride_offer.save(current_user)
                 response = {'message': 'ride offer added successfully.',
-                            'offer id': offer_id}
+                            }
                 return response, 201
             except Exception as e:
                 return {'message':
@@ -76,7 +77,6 @@ class AllRides(Resource):
             query = "SELECT * from rides"
             cursor.execute(query)
             rows = cursor.fetchall()
-            print(cursor.fetchall())
             return jsonify([
                 {'id': row[0], 'start point': row[2],
                  'destination': row[3], 'start_time': row[4], 'route': row[5],
@@ -86,5 +86,39 @@ class AllRides(Resource):
             raise e
 
 
+class JoinRide(Resource):
+
+    @api.doc('Request to join a ride offer',
+             params={'ride_id': 'Id for offer to join'},
+             responses={201: 'Created', 404: 'NOT FOUND', 403: 'EXPIRED'})
+    @jwt_required
+    def post(self, ride_id):
+        """Sends user request to join a ride offer"""
+        try:
+            # sample user
+            current_user = get_jwt_identity()
+            # check whether ride offer is expired
+            query = "SELECT * from rides where ride_id = '{}'" . format(
+                ride_id)
+            cursor.execute(query)
+            row = cursor.fetchone()
+            time = datetime.strptime(row[4], '%B %d %Y %I:%M%p')
+            if time > datetime.now():
+                # save user requests now
+                query = "INSERT INTO requests (date_created, owner_id, user_id, status)\
+                            values('{}', '{}', (SELECT users.user_id \
+                            from users where username='{}'), '{}')"\
+                             . format(datetime.now(), row[1],
+                                      current_user, False)
+                cursor.execute(query)
+                return {'message': 'Your request has been send.'}, 201
+            else:
+                return {'message':
+                        'The ride requested has already expired'}, 403
+        except Exception as e:
+            return {'message': 'That ride does not exist'}, 404
+
+
 api.add_resource(Rides, '/users/rides')
 api.add_resource(AllRides, '/rides')
+api.add_resource(JoinRide, '/rides/<ride_id>/requests')
