@@ -3,11 +3,9 @@ from flask_restplus import Api
 from flask_jwt_extended import JWTManager
 
 from instance.config import configuration
-from application.manage import db as database
+from application.manage import database
 
 from application.models import create_all
-
-db = database
 
 
 def create_app(config, database=None):

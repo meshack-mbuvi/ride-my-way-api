@@ -18,9 +18,9 @@ usermodel = api.model('sign up', {
 })
 
 
-con = connect(database=dbname, user=user, host=host, password=password)
-con.autocommit = True
-cur = con.cursor()
+connection = connect(database=dbname, user=user, host=host, password=password)
+connection.autocommit = True
+cursor = connection.cursor()
 
 
 class UserSignUp(Resource):
@@ -52,8 +52,8 @@ class UserSignUp(Resource):
         user = None
         try:
             query = "select username from users where username='%s'" % username
-            cur.execute(query)
-            user = cur.fetchone()
+            cursor.execute(query)
+            user = cursor.fetchone()
             if user is None:
                 data = request.get_json()
                 user_object = User(data)
@@ -91,13 +91,13 @@ class UserLogin(Resource):
                 email = data['email']
                 query = "select password from users where email='{}'". format(
                     email)
-                cur.execute(query)
-                user = cur.fetchone()
+                cursor.execute(query)
+                user = cursor.fetchone()
             else:
                 query = "select password from users where username='{}'". format(
                     username)
-                cur.execute(query)
-                user = cur.fetchone()
+                cursor.execute(query)
+                user = cursor.fetchone()
 
             if check_password_hash(user[0], password):
                 token = create_access_token(identity=username)

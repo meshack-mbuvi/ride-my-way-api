@@ -6,17 +6,17 @@ host = 'localhost'
 password = 'ridemyway'
 
 
-class db():
+class database():
 
     def connect(self, dbname):
         dbname = dbname
-        con = connect(database=dbname, user=user, host=host, password=password)
-        con.autocommit = True
-        return con
+        connection = connect(database=dbname, user=user, host=host, password=password)
+        connection.autocommit = True
+        return connection
 
     def create_all(self, dbname=dbname):
         # Create all tables here
-        con = self.connect(dbname)
+        connection = self.connect(dbname)
         commands = (
             'DROP TABLE "users" CASCADE',
             'CREATE TABLE users (user_id serial PRIMARY KEY, \
@@ -36,45 +36,45 @@ class db():
         )
 
         try:
-            cur = con.cursor()
+            cursor = connection.cursor()
             # create table one by one
             print("Creating relations")
             for command in commands:
-                cur.execute(command)
+                cursor.execute(command)
             # close communication with the PostgreSQL database server
-            cur.close()
+            cursor.close()
             # commit the changes
-            con.commit()
+            connection.commit()
             print("Done.")
         except (Exception) as error:
             print(error)
         finally:
-            if con is not None:
-                con.close()
+            if connection is not None:
+                connection.close()
 
     def drop_all(self, dbname=dbname):
-        con = self.connect(dbname)
+        connection = self.connect(dbname)
         commands = (
             'DROP TABLE "users" CASCADE',
             'DROP TABLE "rides" CASCADE')
         try:
-            con.autocommit = True
-            cur = con.cursor()
+            connection.autocommit = True
+            cursor = con.cursor()
             # create table one by one
             print("Deleting relations")
             for command in commands:
-                cur.execute(command)
+                cursor.execute(command)
             # close communication with the PostgreSQL database server
-            cur.close()
+            cursor.close()
             # commit the changes
-            con.commit()
+            connection.commit()
             print("Done.")
         except (Exception) as error:
             print(error)
         finally:
-            if con is not None:
-                con.close()
+            if connection is not None:
+                connection.close()
 
 if __name__ == '__main__':
-    db = db()
-    db.create_all()
+    dbObject = database()
+    dbObject.create_all()
