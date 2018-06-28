@@ -30,7 +30,7 @@ class SignTests(unittest.TestCase):
             "phone": "0719800509",
             "confirm password": "mbuvi11"
         }
-        self.data_with_invali_email = {
+        self.data_with_invalid_email = {
             "email": "meshmbuvi",
             "username": "mbuvi1",
             "driver": False,
@@ -88,7 +88,7 @@ class SignTests(unittest.TestCase):
     def test_user_cannot_sign_up_with_invalid_email(self):
         """tests user cannot sign up with invalid email."""
         response = self.app.post('/api/v1/auth/signup',
-                                 data=json.dumps(self.data_with_invali_email),
+                                 data=json.dumps(self.data_with_invalid_email),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.get_data().decode('utf-8'))
