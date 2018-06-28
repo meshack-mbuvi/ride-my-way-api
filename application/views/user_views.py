@@ -25,7 +25,8 @@ cursor = connection.cursor()
 
 class UserSignUp(Resource):
 
-    @api.doc('user accounts', responses={201: 'CREATED', 400: 'BAD FORMAT', 409: 'CONFLICT'})
+    @api.doc('user accounts',
+             responses={201: 'CREATED', 400: 'BAD FORMAT', 409: 'CONFLICT'})
     @api.expect(usermodel)
     def post(self):
         """User sign up"""
@@ -37,7 +38,8 @@ class UserSignUp(Resource):
         email = userData['email']
         password = userData["password"]
 
-        if username == "" or email == "" or phone == "" or confirmPassword == "" or password == "":
+        if username == "" or email == "" or phone == ""\
+                or confirmPassword == "" or password == "":
             return {"message": "All fields are required."}, 400
 
         if len(password) < 6:
@@ -60,7 +62,8 @@ class UserSignUp(Resource):
                 return {'message': 'Account created.'}, 201
             return {'message': 'User exists.'}, 409
         except Exception as e:
-            return {'message': 'We are unable to create your account at the moment.'}, 404
+            return {'message':
+                    'We are unable to create your account at the moment.'}, 404
 
 # model for login
 model_login = api.model('Login', {'email': fields.String,
@@ -69,7 +72,9 @@ model_login = api.model('Login', {'email': fields.String,
 
 class UserLogin(Resource):
 
-    @api.doc('user accounts', responses={201: 'CREATED', 400: 'BAD REQUEST', 401:'INVALID CREDENTIALS',404: 'NOT FOUND'})
+    @api.doc('user accounts',
+             responses={201: 'CREATED', 400: 'BAD REQUEST',
+                        401: 'INVALID CREDENTIALS', 404: 'NOT FOUND'})
     @api.expect(model_login)
     def post(self):
         """User login
@@ -91,8 +96,9 @@ class UserLogin(Resource):
                 cursor.execute(query)
                 user = cursor.fetchone()
             else:
-                query = "select password from users where username='{}'". format(
-                    username)
+                query = \
+                    "select password from users where username='{}'". format(
+                        username)
                 cursor.execute(query)
                 user = cursor.fetchone()
 

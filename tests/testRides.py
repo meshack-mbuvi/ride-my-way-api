@@ -145,9 +145,9 @@ class RidesOfferTests(unittest.TestCase):
         Create a ride offer and retrieve it"""
         # Create a ride offer to be sure there is an offer
         self.app.post('/api/v1/users/rides',
-                                 data=json.dumps(self.ride),
-                                 content_type='application/json',
-                                 headers=self.headers)
+                      data=json.dumps(self.ride),
+                      content_type='application/json',
+                      headers=self.headers)
         # Get ana offer, assuming the order is assigned id=1
         response = self.app.get('/api/v1/rides/1',
                                 content_type='application/json',

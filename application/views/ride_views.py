@@ -1,6 +1,8 @@
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from psycopg2 import connect
 
+from application.models.ride_models import RideOffer
+
 from . import *
 dbname = 'ridemyway'
 user = 'ridemyway'
@@ -11,7 +13,6 @@ connection = connect(database=dbname, user=user, host=host, password=password)
 connection.autocommit = True
 cursor = connection.cursor()
 
-from application.models.ride_models import RideOffer
 
 api = Namespace('Ride offers', Description='Operations on Rides')
 
@@ -49,7 +50,8 @@ class Rides(Resource):
         pass
 
     @api.doc(responses={'message': 'ride offer added successfully.',
-                        201: 'Created', 400: 'BAD FORMAT', 401: 'UNAUTHORIZED'})
+                        201: 'Created', 400: 'BAD FORMAT',
+                        401: 'UNAUTHORIZED'})
     @api.expect(ride)
     @api.header('Authorization', 'Some expected header', required=True)
     @jwt_required
@@ -72,9 +74,11 @@ class Rides(Resource):
                             'offer id': offer_id}
                 return response, 201
             except Exception as e:
-                return {'message': 'use correct format for date and time.'}, 400
+                return {'message':
+                        'use correct format for date and time.'}, 400
         else:
-            return {'message': 'make sure you provide all required fields.'}, 400
+            return {'message':
+                    'make sure you provide all required fields.'}, 400
 
 
 class AllRides(Resource):
