@@ -60,6 +60,7 @@ class UserSignUp(Resource):
                 return {'message': 'Account created.'}, 201
             return {'message': 'User exists.'}, 409
         except Exception as e:
+            print(e)
             return {'message': 'We are unable to create your account at the moment.'}, 404
 
 # model for login

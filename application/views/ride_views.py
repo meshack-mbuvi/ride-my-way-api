@@ -1,5 +1,6 @@
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from psycopg2 import connect
+from application.models.ride_models import RideOffer
 
 from . import *
 dbname = 'ridemyway'
@@ -10,8 +11,6 @@ password = 'ridemyway'
 connection = connect(database=dbname, user=user, host=host, password=password)
 connection.autocommit = True
 cursor = connection.cursor()
-
-from application.models.ride_models import RideOffer
 
 api = Namespace('Ride offers', Description='Operations on Rides')
 
@@ -35,21 +34,9 @@ ride = api.model('Ride offer', {
 # create and retrieve ride offers
 class Rides(Resource):
 
-    def isdriver(self, user):
-        """checks whether user with provided username is a driver.
-        :arg
-            username (str): parameter to be considered.
-        :returns
-            True for driver, False for non-drivers.
-        """
-        # if user.admin:
-        #     return True
-        # else:
-        #     return False
-        pass
-
     @api.doc(responses={'message': 'ride offer added successfully.',
-                        201: 'Created', 400: 'BAD FORMAT', 401: 'UNAUTHORIZED'})
+                        201: 'Created', 400: 'BAD FORMAT',
+                        401: 'UNAUTHORIZED'})
     @api.expect(ride)
     @api.header('Authorization', 'Some expected header', required=True)
     @jwt_required
@@ -72,9 +59,11 @@ class Rides(Resource):
                             'offer id': offer_id}
                 return response, 201
             except Exception as e:
-                return {'message': 'use correct format for date and time.'}, 400
+                return {'message':
+                        'use correct format for date and time.'}, 400
         else:
-            return {'message': 'make sure you provide all required fields.'}, 400
+            return {'message':
+                    'make sure you provide all required fields.'}, 400
 
 
 class AllRides(Resource):
@@ -85,10 +74,18 @@ class AllRides(Resource):
     @jwt_required
     def get(self):
         """Retrieves all available rides"""
-        query = "SELECT * from rides"
-        cursor.execute(query)
-        return jsonify([{'id': i[0], 'start point': i[2], 'destination':
-                         i[3], 'start_time': i[4], 'route': i[5], 'available space': i[6]} for i in cursor.fetchall()])
+        try:
+            query = "SELECT * from rides"
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            print(cursor.fetchall())
+            return jsonify([
+                {'id': row[0], 'start point': row[2],
+                 'destination': row[3], 'start_time': row[4], 'route': row[5],
+                 'available space': row[6]}
+                for row in rows])
+        except Exception as e:
+            raise e
 
 
 api.add_resource(Rides, '/users/rides')

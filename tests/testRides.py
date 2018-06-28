@@ -138,6 +138,7 @@ class RidesOfferTests(unittest.TestCase):
                                 headers=self.headers)
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.get_data().decode('utf-8'))
+        print(response_data)
         self.assertTrue(response_data[0] is not None)
 
 if __name__ == '__main__':
