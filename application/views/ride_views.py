@@ -34,6 +34,9 @@ class JoinRide(Resource):
             username = 'Meshack Mbuvi'
             # check whether ride offer is expired
             ride = rides[int(ride_id)]
+            ex = datetime.strptime(ride['start_time'], "%B %d %Y %I:%M%p")
+            if ex <= datetime.now():
+                return {'message': 'Ride offer has expired'}, 404
             requests = len(ride['requests'])
             if requests < (ride['available_space']):
                 ride['requests'].append(username)
@@ -78,14 +81,7 @@ class Rides(Resource):
     @api.doc('list of rides', responses={200: 'OK'})
     def get(self):
         """Retrieves all available rides"""
-        available_rides = {}
-        for key, value in rides.items():
-            # if value['start_time'] >= datetime.now():
-                # convert to date to string
-            value['start_time'] = datetime.strftime(
-                value['start_time'], '%B %d %Y %I:%M%p')
-            available_rides[key] = value
-        return (available_rides)
+        return (rides)
 
 api.add_resource(Rides, '/rides')
 
