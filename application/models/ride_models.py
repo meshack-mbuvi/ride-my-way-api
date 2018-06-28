@@ -18,6 +18,7 @@ class RideOffer(object):
         self.startTime = datetime.strptime(data['start time'],
                                             '%B %d %Y %I:%M%p')
         self.availableTpace = data['available space']
+
         self.requests = []
 
     def getDict(self):
