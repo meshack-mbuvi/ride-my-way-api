@@ -98,8 +98,7 @@ class UserLogin(Resource):
                 cursor.execute(query)
                 user = cursor.fetchone()
             else:
-                query = "select password from users where username='{}'"
-                . format(username)
+                query = "select password from users where username='{}'" . format(username)
                 cursor.execute(query)
                 user = cursor.fetchone()
 
