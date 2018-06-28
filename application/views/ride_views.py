@@ -69,9 +69,11 @@ class Rides(Resource):
                             'offer id': offer_id}
                 return response, 201
             except Exception as e:
-                return {'message': 'use correct format for date and time.'}, 400
+                return {'message':
+                        'use correct format for date and time.'}, 400
         else:
-            return {'message': 'make sure you provide all required fields.'}, 400
+            return {'message':
+                    'make sure you provide all required fields.'}, 400
 
     @api.doc('list of rides', responses={200: 'OK'})
     def get(self):

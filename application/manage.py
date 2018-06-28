@@ -10,7 +10,8 @@ class database():
 
     def connect(self, dbname):
         dbname = dbname
-        connection = connect(database=dbname, user=user, host=host, password=password)
+        connection = connect(database=dbname,
+                             user=user, host=host, password=password)
         connection.autocommit = True
         return connection
 

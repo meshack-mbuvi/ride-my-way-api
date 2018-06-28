@@ -16,7 +16,7 @@ class RideOffer(object):
         self.destination = data['destination']
         self.route = data['route']
         self.startTime = datetime.strptime(data['start time'],
-                                            '%B %d %Y %I:%M%p')
+                                           '%B %d %Y %I:%M%p')
         self.availableTpace = data['available space']
         self.requests = []
 

@@ -25,7 +25,9 @@ cursor = connection.cursor()
 
 class UserSignUp(Resource):
 
-    @api.doc('user accounts', responses={201: 'CREATED', 400: 'BAD FORMAT', 409: 'CONFLICT'})
+    @api.doc('user accounts',
+             responses={201: 'CREATED',
+                        400: 'BAD FORMAT', 409: 'CONFLICT'})
     @api.expect(usermodel)
     def post(self):
         """User sign up"""
@@ -37,7 +39,8 @@ class UserSignUp(Resource):
         email = data['email']
         password = data["password"]
 
-        if username == "" or email == "" or phone == "" or confirmPassword == "" or password == "":
+        if username == "" or email == "" or phone == ""\
+                or confirmPassword == "" or password == "":
             return {"message": "All fields are required."}, 400
 
         if len(password) < 6:
@@ -61,6 +64,7 @@ class UserSignUp(Resource):
                 return {'message': 'Account created.'}, 201
             return {'message': 'User exists.'}, 409
         except Exception as e:
-            return {'message': 'We are unable to create your account at the moment.'}, 404
+            return {'message':
+                    'We are unable to create your account at the moment.'}, 404
 
 api.add_resource(UserSignUp, '/auth/signup')
