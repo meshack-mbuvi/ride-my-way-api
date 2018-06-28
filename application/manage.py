@@ -76,5 +76,5 @@ class database():
                 connection.close()
 
 if __name__ == '__main__':
-    db_object = database()
-    db_object.create_all()
+    dbObject = database()
+    dbObject.create_all()

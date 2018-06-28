@@ -32,12 +32,12 @@ class UserSignUp(Resource):
         data = request.get_json()
 
         username = data['username']
-        confirm_password = data['confirm password']
+        confirmPassword = data['confirm password']
         phone = data['phone']
         email = data['email']
         password = data["password"]
 
-        if username == "" or email == "" or phone == "" or confirm_password == "" or password == "":
+        if username == "" or email == "" or phone == "" or confirmPassword == "" or password == "":
             return {"message": "All fields are required."}, 400
 
         if len(password) < 6:
@@ -46,7 +46,7 @@ class UserSignUp(Resource):
         if not validate_email(email):
             return {"message": "Email is invalid"}, 400
 
-        if not password == confirm_password:
+        if not password == confirmPassword:
             return {'message': 'Passwords do not match'}, 400
 
         user = None
@@ -56,8 +56,8 @@ class UserSignUp(Resource):
             user = cursor.fetchone()
             if user is None:
                 data = request.get_json()
-                user_object = User(data)
-                user_object.save()
+                userObject = User(data)
+                userObject.save()
                 return {'message': 'Account created.'}, 201
             return {'message': 'User exists.'}, 409
         except Exception as e:

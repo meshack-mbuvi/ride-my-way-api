@@ -62,8 +62,8 @@ class Rides(Resource):
                 return {'message': 'available space can only be numbers.'}, 400
             try:
                 # set id for the ride offer
-                ride_offer = RideOffer(data)
-                offer_id = len(rides) + 1
+                rideOffer = RideOffer(data)
+                offerId = len(rides) + 1
                 rides[offer_id] = ride_offer.getDict()
                 response = {'message': 'ride offer added successfully.',
                             'offer id': offer_id}
@@ -76,14 +76,14 @@ class Rides(Resource):
     @api.doc('list of rides', responses={200: 'OK'})
     def get(self):
         """Retrieves all available rides"""
-        available_rides = {}
+        availableRides = {}
         for key, value in rides.items():
             if value['start_time'] >= datetime.now():
                 # convert to date to string
                 value['start_time'] = datetime.strftime(
                     value['start_time'], '%B %d %Y %I:%M%p')
-                available_rides[key] = value
-        return (available_rides)
+                availableRides[key] = value
+        return (availableRides)
 
 api.add_resource(Rides, '/rides')
 
