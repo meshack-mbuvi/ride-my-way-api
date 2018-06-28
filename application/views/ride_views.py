@@ -34,17 +34,22 @@ class JoinRide(Resource):
             username = 'Meshack Mbuvi'
             # check whether ride offer is expired
             ride = rides[int(ride_id)]
-            if ride['start_time'] >= datetime.now():
+            ex = datetime.strptime(ride['start_time'], "%B %d %Y %I:%M%p")
+            if ex <= datetime.now():
+                return {'message': 'Ride offer has expired'}, 404
+            requests = len(ride['requests'])
+            if requests < (ride['available_space']):
                 ride['requests'].append(username)
                 return {'message': 'Your request has been send.'}, 201
             else:
                 return {'message':
-                        'The ride requested has already expired'}, 403
+                        'The ride has no available space'}, 403
         except Exception as e:
+            print(e)
             return {'message': 'That ride does not exist'}, 404
 
 
-api.add_resource(JoinRide, '/rides/<ride_id>/requests')
+api.add_resource(JoinRide, '/rides/<string:ride_id>/requests')
 
 
 class Rides(Resource):
@@ -86,6 +91,7 @@ class Rides(Resource):
                     value['start_time'], '%B %d %Y %I:%M%p')
                 availableRides[key] = value
         return (availableRides)
+
 
 api.add_resource(Rides, '/rides')
 
