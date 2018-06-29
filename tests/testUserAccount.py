@@ -2,7 +2,7 @@ import json
 import unittest
 from psycopg2 import connect
 
-from application import create_app, db as database
+from application import create_app, database
 from application.models import dbname, user, host, password
 
 
@@ -30,6 +30,7 @@ class SignTests(unittest.TestCase):
             "phone": "0719800509",
             "confirm password": "mbuvi11"
         }
+
         self.data_with_invalid_email = {
             "email": "meshmbuvi",
             "username": "mbuvi1",
@@ -89,6 +90,7 @@ class SignTests(unittest.TestCase):
         """tests user cannot sign up with invalid email."""
         response = self.app.post('/api/v1/auth/signup',
                                  data=json.dumps(self.data_with_invalid_email),
+
                                  content_type='application/json')
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.get_data().decode('utf-8'))
@@ -129,7 +131,6 @@ class SignTests(unittest.TestCase):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],
                          'password should be 6 characters or more.')
-
 
 class LoginTests(unittest.TestCase):
 
@@ -231,7 +232,6 @@ class LoginTests(unittest.TestCase):
         received_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(received_data[
                          'message'], "Successfully logged out", msg="User should be logged out")
-
 
 if __name__ == '__main__':
     unittest.main()
