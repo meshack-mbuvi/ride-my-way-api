@@ -26,17 +26,18 @@ cursor = connection.cursor()
 class UserSignUp(Resource):
 
     @api.doc('user accounts',
-             responses={201: 'CREATED', 400: 'BAD FORMAT', 409: 'CONFLICT'})
+             responses={201: 'CREATED',
+                        400: 'BAD FORMAT', 409: 'CONFLICT'})
     @api.expect(usermodel)
     def post(self):
         """User sign up"""
         userData = request.get_json()
-
         username = userData['username']
         confirmPassword = userData['confirm password']
         phone = userData['phone']
         email = userData['email']
         password = userData["password"]
+
 
         if username == "" or email == "" or phone == ""\
                 or confirmPassword == "" or password == "":
@@ -57,6 +58,7 @@ class UserSignUp(Resource):
             cursor.execute(query)
             user = cursor.fetchone()
             if user is None:
+                data = request.get_json()
                 userObject = User(userData)
                 userObject.save()
                 return {'message': 'Account created.'}, 201
@@ -109,6 +111,7 @@ class UserLogin(Resource):
                 return {'message': 'Invalid crententials.'}, 401
         except Exception as e:
             return {'message': 'User not found.'}, 404
+
 
 api.add_resource(UserSignUp, '/auth/signup')
 api.add_resource(UserLogin, '/auth/login')

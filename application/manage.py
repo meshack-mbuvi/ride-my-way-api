@@ -8,14 +8,17 @@ password = 'ridemyway'
 
 class database():
 
-    def connect(self):
-        connection = connect(database=dbname, user=user, host=host, password=password)
+    def connect(self, dbname):
+        dbname = dbname
+        connection = connect(database=dbname,
+                             user=user, host=host, password=password)
+
         connection.autocommit = True
         return connection
 
     def create_all(self):
         # Create all tables here
-        connection = self.connect()
+        connection = self.connect(dbname)
         commands = (
             'DROP TABLE "users" CASCADE',
             'CREATE TABLE users (user_id serial PRIMARY KEY, \
@@ -52,8 +55,8 @@ class database():
             if connection is not None:
                 connection.close()
 
-    def drop_all(self):
-        connection = self.connect()
+    def drop_all(self, dbname=dbname):
+        connection = self.connect(dbname)
         commands = (
             'DROP TABLE "users" CASCADE',
             'DROP TABLE "rides" CASCADE')
