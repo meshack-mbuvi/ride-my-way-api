@@ -54,12 +54,14 @@ class Rides(Resource):
                 ride_offer = RideOffer(data)
                 # save data here
                 offer_id = ride_offer.save(current_user)
-
                 response = {'message': 'ride offer added successfully.',
                             'offer id': offer_id}
                 return response, 201
             except Exception as e:
-                return {'message': 'use correct format for date and time.'}, 400
+                return {'message':
+                        'use correct format for date and time.'}, 400
         else:
-            return {'message': 'make sure you provide all required fields.'}, 400
+            return {'message':
+                    'make sure you provide all required fields.'}, 400
+
 api.add_resource(Rides, '/users/rides')

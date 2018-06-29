@@ -102,6 +102,7 @@ class SignTests(unittest.TestCase):
                       content_type='application/json')
         response = self.app.post('/api/v1/auth/signup',
                                  data=json.dumps(self.userData),
+
                                  content_type='application/json')
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 409)
@@ -215,7 +216,6 @@ class LoginTests(unittest.TestCase):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response_data['message'], 'User not found.')
-
 
 if __name__ == '__main__':
     unittest.main()
