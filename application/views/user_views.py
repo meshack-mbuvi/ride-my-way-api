@@ -25,19 +25,22 @@ cursor = connection.cursor()
 
 class UserSignUp(Resource):
 
-    @api.doc('user accounts', responses={201: 'CREATED', 400: 'BAD FORMAT', 409: 'CONFLICT'})
+    @api.doc('user accounts',
+             responses={201: 'CREATED',
+                        400: 'BAD FORMAT', 409: 'CONFLICT'})
     @api.expect(usermodel)
     def post(self):
         """User sign up"""
-        userData = request.get_json()
+        data = request.get_json()
 
-        username = userData['username']
-        confirmPassword = userData['confirm password']
-        phone = userData['phone']
-        email = userData['email']
-        password = userData["password"]
+        username = data['username']
+        confirmPassword = data['confirm password']
+        phone = data['phone']
+        email = data['email']
+        password = data["password"]
 
-        if username == "" or email == "" or phone == "" or confirmPassword == "" or password == "":
+        if username == "" or email == "" or phone == ""\
+                or confirmPassword == "" or password == "":
             return {"message": "All fields are required."}, 400
 
         if len(password) < 6:
@@ -55,7 +58,7 @@ class UserSignUp(Resource):
             cursor.execute(query)
             user = cursor.fetchone()
             if user is None:
-                userObject = User(userData)
+                userObject = User(data)
                 userObject.save()
                 return {'message': 'Account created.'}, 201
             return {'message': 'User exists.'}, 409

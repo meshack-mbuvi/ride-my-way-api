@@ -54,7 +54,7 @@ class Rides(Resource):
                 # save data here
                 offer_id = ride_offer.save(current_user)
                 response = {'message': 'ride offer added successfully.',
-                            'offer id': offer_id}
+                            }
                 return response, 201
             except Exception as e:
                 return {'message':
