@@ -4,10 +4,11 @@ from werkzeug.security import generate_password_hash
 from . import *
 
 
-def createTable(table_name):
+
+def createTable(tableName):
     cursor = connection.cursor()
     try:
-        cursor.execute('SELECT 1 from {}' . format(table_name))
+        cursor.execute('SELECT 1 from {}' . format(tableName))
         return True
     except Exception as e:
         commands = 'CREATE TABLE users (user_id serial PRIMARY KEY, \
@@ -22,17 +23,18 @@ def createTable(table_name):
 
 class User():
 
-    def __init__(self, user_data):
-        self.username = user_data['username']
-        self.email = user_data['email']
+    def __init__(self, userData):
+        self.username = userData['username']
+        self.email = userData['email']
         self.password = generate_password_hash(
-            user_data['password'], method='sha256')
-        self.phone = user_data['phone']
-        self.driver = user_data['driver']
+            userData['password'], method='sha256')
+        self.phone = userData['phone']
+        self.driver = userData['driver']
 
     def save(self):
         # insert new record
-        query = "INSERT INTO users (username,email,password,phone,driver) VALUES " \
+        query = "\
+        INSERT INTO users (username,email,password,phone,driver) VALUES " \
             "('" + self.username + "', '" + self.email + "', '" + self.password + "', \
              {},{})". format(self.phone, self.driver)
         cursor.execute(query)

@@ -10,7 +10,8 @@ class database():
 
     def connect(self, dbname):
         dbname = dbname
-        connection = connect(database=dbname, user=user, host=host, password=password)
+        connection = connect(database=dbname,
+                             user=user, host=host, password=password)
         connection.autocommit = True
         return connection
 
@@ -59,7 +60,7 @@ class database():
             'DROP TABLE "rides" CASCADE')
         try:
             connection.autocommit = True
-            cursor = con.cursor()
+            cursor = connection.cursor()
             # create table one by one
             print("Deleting relations")
             for command in commands:

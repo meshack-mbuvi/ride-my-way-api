@@ -34,17 +34,22 @@ class JoinRide(Resource):
             username = 'Meshack Mbuvi'
             # check whether ride offer is expired
             ride = rides[int(ride_id)]
-            if ride['start_time'] >= datetime.now():
+            ex = datetime.strptime(ride['start_time'], "%B %d %Y %I:%M%p")
+            if ex <= datetime.now():
+                return {'message': 'Ride offer has expired'}, 404
+            requests = len(ride['requests'])
+            if requests < (ride['available_space']):
                 ride['requests'].append(username)
                 return {'message': 'Your request has been send.'}, 201
             else:
                 return {'message':
-                        'The ride requested has already expired'}, 403
+                        'The ride has no available space'}, 403
         except Exception as e:
+            print(e)
             return {'message': 'That ride does not exist'}, 404
 
 
-api.add_resource(JoinRide, '/rides/<ride_id>/requests')
+api.add_resource(JoinRide, '/rides/<string:ride_id>/requests')
 
 
 class Rides(Resource):
@@ -62,28 +67,31 @@ class Rides(Resource):
                 return {'message': 'available space can only be numbers.'}, 400
             try:
                 # set id for the ride offer
-                ride_offer = RideOffer(data)
-                offer_id = len(rides) + 1
+                rideOffer = RideOffer(data)
+                offerId = len(rides) + 1
                 rides[offer_id] = ride_offer.getDict()
                 response = {'message': 'ride offer added successfully.',
                             'offer id': offer_id}
                 return response, 201
             except Exception as e:
-                return {'message': 'use correct format for date and time.'}, 400
+                return {'message':
+                        'use correct format for date and time.'}, 400
         else:
-            return {'message': 'make sure you provide all required fields.'}, 400
+            return {'message':
+                    'make sure you provide all required fields.'}, 400
 
     @api.doc('list of rides', responses={200: 'OK'})
     def get(self):
         """Retrieves all available rides"""
-        available_rides = {}
+        availableRides = {}
         for key, value in rides.items():
             if value['start_time'] >= datetime.now():
                 # convert to date to string
                 value['start_time'] = datetime.strftime(
                     value['start_time'], '%B %d %Y %I:%M%p')
-                available_rides[key] = value
-        return (available_rides)
+                availableRides[key] = value
+        return (availableRides)
+
 
 api.add_resource(Rides, '/rides')
 
