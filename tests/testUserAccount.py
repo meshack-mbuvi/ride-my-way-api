@@ -64,7 +64,7 @@ class SignTests(unittest.TestCase):
         self.db.drop_all()
 
     def test_user_can_sign_up(self):
-        """tests user can create an account."""
+        """test user can create an account."""
         response = self.app.post('/api/v1/auth/signup',
                                  data=json.dumps(self.userData),
                                  content_type='application/json')
@@ -75,7 +75,7 @@ class SignTests(unittest.TestCase):
                          'Account created.')
 
     def test_user_cannot_sign_up_with_unmatching_passwords(self):
-        """tests user cannot sign up with unmatching passwords."""
+        """test user cannot sign up with unmatching passwords."""
         response = self.app.post('/api/v1/auth/signup',
                                  data=json.dumps(
                                      self.data_with_unmatching_passwords),
@@ -86,7 +86,7 @@ class SignTests(unittest.TestCase):
                          'Passwords do not match')
 
     def test_user_cannot_sign_up_with_invalid_email(self):
-        """tests user cannot sign up with invalid email."""
+        """test user cannot sign up with invalid email."""
         response = self.app.post('/api/v1/auth/signup',
                                  data=json.dumps(self.data_with_invali_email),
                                  content_type='application/json')
@@ -96,13 +96,12 @@ class SignTests(unittest.TestCase):
                          'Email is invalid')
 
     def test_user_cannot_sign_up_twice(self):
-        """tests user cannot sign up twice."""
+        """test user cannot sign up twice."""
         self.app.post('/api/v1/auth/signup',
                       data=json.dumps(self.userData),
                       content_type='application/json')
         response = self.app.post('/api/v1/auth/signup',
                                  data=json.dumps(self.userData),
-
                                  content_type='application/json')
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 409)
@@ -110,7 +109,7 @@ class SignTests(unittest.TestCase):
                          'User exists.')
 
     def test_user_cannot_sign_up_with_empty_passwords(self):
-        """tests user cannot sign up with empty fields."""
+        """test user cannot sign up with empty fields."""
         response = self.app.post('/api/v1/auth/signup',
                                  data=json.dumps(
                                      self.data_with_empty_password),
@@ -121,7 +120,7 @@ class SignTests(unittest.TestCase):
                          'All fields are required.')
 
     def test_password_cannot_be_less_than_six_characters(self):
-        """tests user cannot sign up with empty fields."""
+        """test user cannot sign up with empty fields."""
         response = self.app.post('/api/v1/auth/signup',
                                  data=json.dumps(
                                      self.data_with_short_password),
@@ -175,13 +174,19 @@ class LoginTests(unittest.TestCase):
             "password": "mbuvi1"
         }
 
+        self.login_with_empty_password = {
+            "email": "meshmbuvi@gmail.com",
+            "username": "musyoka",
+            "password": ""
+        }
+
     def tearDown(self):
         self.app = None
         self.db = database()
         self.db.create_all()
 
     def test_user_can_login(self):
-        """tests user can log in"""
+        """test user can log in"""
         response = self.app.post('/api/v1/auth/login',
                                  data=json.dumps(self.valid_user),
                                  content_type='application/json')
@@ -190,7 +195,7 @@ class LoginTests(unittest.TestCase):
         self.assertIn('token', response_data)
 
     def test_user_can_login_with_email(self):
-        """tests user can log in"""
+        """test  user can log in with email"""
         response = self.app.post('/api/v1/auth/login',
                                  data=json.dumps(self.login_with_email),
                                  content_type='application/json')
@@ -199,7 +204,7 @@ class LoginTests(unittest.TestCase):
         self.assertIn('token', response_data)
 
     def test_user_cannot_login_with_invalid_details(self):
-        """tests user can log in"""
+        """test user cannot login with invalid details"""
         response = self.app.post('/api/v1/auth/login',
                                  data=json.dumps(self.invalid_password),
                                  content_type='application/json')
@@ -209,13 +214,25 @@ class LoginTests(unittest.TestCase):
                          'Invalid crententials.')
 
     def test_non_existing_user_cannot_login(self):
-        """tests user can log in"""
+        """test non-existing user cannot login"""
         response = self.app.post('/api/v1/auth/login',
                                  data=json.dumps(self.user_not_exist),
                                  content_type='application/json')
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response_data['message'], 'User not found.')
+
+    def test_cannot_login_with_empty_password(self):
+        """test cannot login with empty password"""
+        response = self.app.post('/api/v1/auth/login',
+                                 data=json.dumps(
+                                     self.login_with_empty_password),
+                                 content_type='application/json')
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response_data['message'],
+                         'Password or username cannot be empty.')
+
 
 if __name__ == '__main__':
     unittest.main()
