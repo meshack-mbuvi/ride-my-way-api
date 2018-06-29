@@ -14,7 +14,7 @@ class SignTests(unittest.TestCase):
         self.app = create_app('testing')
         self.app = self.app.test_client()
 
-        self.user_data = {
+        self.userData = {
             "email": "meshmbuvi@gmail.com",
             "username": "musyoka",
             "driver": True,
@@ -66,7 +66,7 @@ class SignTests(unittest.TestCase):
     def test_user_can_sign_up(self):
         """tests user can create an account."""
         response = self.app.post('/api/v1/auth/signup',
-                                 data=json.dumps(self.user_data),
+                                 data=json.dumps(self.userData),
                                  content_type='application/json')
 
         response_data = json.loads(response.get_data().decode('utf-8'))
@@ -98,10 +98,11 @@ class SignTests(unittest.TestCase):
     def test_user_cannot_sign_up_twice(self):
         """tests user cannot sign up twice."""
         self.app.post('/api/v1/auth/signup',
-                      data=json.dumps(self.user_data),
+                      data=json.dumps(self.userData),
                       content_type='application/json')
         response = self.app.post('/api/v1/auth/signup',
-                                 data=json.dumps(self.user_data),
+                                 data=json.dumps(self.userData),
+
                                  content_type='application/json')
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 409)
@@ -129,6 +130,92 @@ class SignTests(unittest.TestCase):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],
                          'password should be 6 characters or more.')
+
+
+class LoginTests(unittest.TestCase):
+
+    def setUp(self):
+        """Prepare testing environment."""
+
+        self.app = create_app('testing')
+        self.app = self.app.test_client()
+        self.db = database()
+        self.db.create_all()
+
+        self.user_data = {
+            "email": "meshmbuvi@gmail.com",
+            "username": "musyoka",
+            "driver": True,
+            "password": "mbuvi1",
+            "phone": "0719800509",
+            "confirm password": "mbuvi1"
+        }
+        # Register user
+        response = self.app.post('/api/v1/auth/signup',
+                                 data=json.dumps(self.user_data),
+                                 content_type='application/json')
+        self.valid_user = {
+            "email": "meshmbuvi@gmail.com",
+            "username": "musyoka",
+            "password": "mbuvi1"
+        }
+        self.invalid_password = {
+            "email": "meshmbuvi@gmail.com",
+            "username": "musyoka",
+            "password": "mbuvi1111"
+        }
+        self.login_with_email = {
+            "email": "meshmbuvi@gmail.com",
+            "username": "musyoka",
+            "password": "mbuvi1"
+        }
+        self.user_not_exist = {
+            "email": "meshmbuvi@gmail.comdsghdfdhg",
+            "username": "mutadbkjdhgksjdg",
+            "password": "mbuvi1"
+        }
+
+    def tearDown(self):
+        self.app = None
+        self.db = database()
+        self.db.create_all()
+
+    def test_user_can_login(self):
+        """tests user can log in"""
+        response = self.app.post('/api/v1/auth/login',
+                                 data=json.dumps(self.valid_user),
+                                 content_type='application/json')
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response.status_code, 201)
+        self.assertIn('token', response_data)
+
+    def test_user_can_login_with_email(self):
+        """tests user can log in"""
+        response = self.app.post('/api/v1/auth/login',
+                                 data=json.dumps(self.login_with_email),
+                                 content_type='application/json')
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response.status_code, 201)
+        self.assertIn('token', response_data)
+
+    def test_user_cannot_login_with_invalid_details(self):
+        """tests user can log in"""
+        response = self.app.post('/api/v1/auth/login',
+                                 data=json.dumps(self.invalid_password),
+                                 content_type='application/json')
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response_data['message'],
+                         'Invalid crententials.')
+
+    def test_non_existing_user_cannot_login(self):
+        """tests user can log in"""
+        response = self.app.post('/api/v1/auth/login',
+                                 data=json.dumps(self.user_not_exist),
+                                 content_type='application/json')
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response_data['message'], 'User not found.')
 
 if __name__ == '__main__':
     unittest.main()
