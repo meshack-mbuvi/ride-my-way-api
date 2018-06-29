@@ -29,6 +29,7 @@ class database():
             'DROP TABLE "rides" CASCADE',
             'CREATE TABLE rides (ride_id serial PRIMARY KEY, \
                        owner_id serial, \
+                       start_point varchar(255), \
                        destination varchar(255), \
                        start_time varchar(50) NOT NULL, \
                        route varchar(255) NOT NULL, \

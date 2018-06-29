@@ -1,4 +1,5 @@
 from datetime import datetime
+from . import *
 
 
 class RideOffer(object):
@@ -10,16 +11,26 @@ class RideOffer(object):
     available space: Int available space for passengers
     requests : List holding users who request to join the ride
     """
+    def __init__(self, ridedata):
+        self.start_point = ridedata['start point']
+        self.destination = ridedata['destination']
+        date = datetime.strptime(ridedata['start time'], '%B %d %Y %I:%M%p')
+        self.start_time = datetime.strftime(date, '%B %d %Y %I:%M%p')
+        self.route = ridedata['route']
+        self.available_space = ridedata['available space']
 
-    def __init__(self, data):
-        self.start_point = data['start point']
-        self.destination = data['destination']
-        self.route = data['route']
-        self.startTime = datetime.strptime(data['start time'],
-                                           '%B %d %Y %I:%M%p')
-        self.availableTpace = data['available space']
+    def save(self, current_user):
+        # insert new record
+        query = "INSERT INTO rides (owner_id,start_point,destination,start_time,route,available_space) \
+                VALUES ((SELECT user_id from users where username ='{}'), '{}',\
+                        '{}','{}','{}', '{}')" . format(current_user,
+                                                  self.start_point,
+                                                  self.destination,
+                                                  self.start_time,
+                                                  self.route,
+                                                  self.available_space)
+        cursor.execute(query)
+        connection.commit()
 
-        self.requests = []
-
-    def getDict(self):
-        return self.__dict__
+    def fetch_all(self):
+        pass
