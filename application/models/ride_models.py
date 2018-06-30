@@ -11,6 +11,13 @@ class RideOffer(object):
     available space: Int available space for passengers
     requests : List holding users who request to join the ride
     """
+    def __init__(self, ridedata):
+        self.start_point = ridedata['start point']
+        self.destination = ridedata['destination']
+        date = datetime.strptime(ridedata['start time'], '%B %d %Y %I:%M%p')
+        self.start_time = datetime.strftime(date, '%B %d %Y %I:%M%p')
+        self.route = ridedata['route']
+        self.available_space = ridedata['available space']
 
     def __init__(self, ridedata):
         self.start_point = ridedata['start point']
@@ -33,6 +40,7 @@ class RideOffer(object):
                                                         self.available_space)
         cursor.execute(query)
         connection.commit()
+
 
     def fetch_all(self):
         pass

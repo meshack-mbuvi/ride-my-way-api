@@ -6,19 +6,19 @@ from . import *
 
 class User():
 
-    def __init__(self, userData):
-        self.username = userData['username']
-        self.email = userData['email']
+    def __init__(self, user_data):
+        self.username = user_data['username']
+        self.email = user_data['email']
         self.password = generate_password_hash(
-            userData['password'], method='sha256')
-        self.phone = userData['phone']
-        self.driver = userData['driver']
+            user_data['password'], method='sha256')
+        self.phone = user_data['phone']
+        self.driver = user_data['driver']
 
     def save(self):
         # insert new record
-        query = "\
-        INSERT INTO users (username,email,password,phone,driver) VALUES " \
+        query = "INSERT INTO users (username,email,password,phone,driver) VALUES " \
             "('" + self.username + "', '" + self.email + "', '" + self.password + "', \
              {},{})". format(self.phone, self.driver)
         cursor.execute(query)
         connection.commit()
+        return

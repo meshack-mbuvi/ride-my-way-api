@@ -1,6 +1,16 @@
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from psycopg2 import connect
 
+
+from . import *
+dbname = 'ridemyway'
+user = 'ridemyway'
+host = 'localhost'
+password = 'ridemyway'
+
+connection = connect(database=dbname, user=user, host=host, password=password)
+connection.autocommit = True
+cursor = connection.cursor()
 from application.models.ride_models import RideOffer
 
 from . import *
@@ -67,7 +77,6 @@ class Rides(Resource):
             return {'message':
                     'make sure you provide all required fields.'}, 400
 
-
 class AllRides(Resource):
 
     @api.doc('Get Available rides',
@@ -119,3 +128,4 @@ class SingleRide(Resource):
 api.add_resource(Rides, '/users/rides')
 api.add_resource(AllRides, '/rides')
 api.add_resource(SingleRide, '/rides/<string:ride_id>')
+api.add_resource(Rides, '/users/rides')
