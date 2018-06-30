@@ -15,9 +15,6 @@ cursor = connection.cursor()
 
 api = Namespace('Ride offers', Description='Operations on Rides')
 
-# data structure to store ride offers
-
-rides = {}
 
 ride = api.model('Ride offer', {
     'start point': fields.String(description='location of the driver'),
@@ -30,6 +27,36 @@ ride = api.model('Ride offer', {
     'available space': fields.Integer(
         description='available space for passengers')
 })
+
+
+def past_date(date_string):
+    """checks whether date given is a past date
+    :returns True for past date, False otherwise."""
+    try:
+        str_to_date = datetime.strptime(date_string, "%B %m %Y %I:%M%p").date()
+        if str_to_date > datetime.now().date():
+            return False
+        return True
+    except Exception as e:
+        # catch invalid date format
+        return False
+
+
+def convert_date(date_string):
+    try:
+        date = datetime.strptime(date_string, '%B %d %Y %I:%M%p')
+        startTime = datetime.strftime(date, '%B %d %Y %I:%M%p')
+        return startTime
+    except Exception as e:
+        return None
+
+
+def str_to_date(date_string):
+    try:
+        date = datetime.strptime(date_string, '%B %d %Y %I:%M%p')
+        return date
+    except Exception as e:
+        return None
 
 
 class Rides(Resource):
@@ -49,14 +76,34 @@ class Rides(Resource):
             # save ride to data structure
             if not isinstance(data['available space'], int):
                 return {'message': 'available space can only be numbers.'}, 400
+            if past_date(data['start time']):
+                return {'message': 'Cannot create an expired ride'}, 403
+
             try:
                 # set id for the ride offer
-                ride_offer = RideOffer(data)
-                # save data here
-                ride_offer.save(current_user)
-                response = {'message': 'ride offer added successfully.',
-                            }
-                return response, 201
+
+                start_time = convert_date(data['start time'])
+                if not start_time == '':
+                    query = "SELECT * from rides where start_point='{}'\
+                     and destination = '{}' and start_time='{}' \
+                     and owner_id=(SELECT user_id from users \
+                     where username='{}')" . format(data['start point'],
+                                                    data['destination'],
+                                                    start_time, current_user)
+
+                    cursor.execute(query)
+                    row = cursor.fetchone()
+                    if row is None:
+                        data['start time'] = start_time
+                        ride_offer = RideOffer(data)
+                        # save data here
+                        ride_offer.save(current_user)
+                        response = {'message': 'ride offer added successfully.',
+                                    }
+                        return response, 201
+                    return {'message': 'offer exists.'}, 409
+                return {'message':
+                        'use correct format for date and time.'}, 400
             except Exception as e:
                 return {'message':
                         'use correct format for date and time.'}, 400
@@ -102,7 +149,7 @@ class JoinRide(Resource):
                 ride_id)
             cursor.execute(query)
             row = cursor.fetchone()
-            time = datetime.strptime(row[4], '%B %d %Y %I:%M%p')
+            time = str_to_date(row[4])
             if time > datetime.now():
                 # save user requests now
                 query = "INSERT INTO requests (date_created, owner_id, user_id, status)\
@@ -116,6 +163,7 @@ class JoinRide(Resource):
                 return {'message':
                         'The ride requested has already expired'}, 403
         except Exception as e:
+            print(e)
             return {'message': 'That ride does not exist'}, 404
 
 

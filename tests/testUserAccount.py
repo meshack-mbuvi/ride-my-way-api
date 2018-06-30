@@ -42,9 +42,9 @@ class SignTests(unittest.TestCase):
             "email": "meshmbuvi@gmail.com",
             "username": "mbuvi",
             "driver": True,
-            "password": "",
+            "password": "  ",
             "phone": "0719800509",
-            "confirm password": ""
+            "confirm password": "  "
         }
 
         self.data_with_short_password = {
@@ -117,7 +117,7 @@ class SignTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],
-                         'All fields are required.')
+                         'Please ensure all fields are non-empty.')
 
     def test_password_cannot_be_less_than_six_characters(self):
         """tests user cannot sign up with empty fields."""

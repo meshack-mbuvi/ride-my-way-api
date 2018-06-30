@@ -37,8 +37,9 @@ class UserSignUp(Resource):
         email = userData['email']
         password = userData["password"]
 
-        if username == "" or email == "" or phone == "" or confirmPassword == "" or password == "":
-            return {"message": "All fields are required."}, 400
+        if username.strip() == "" or email == "" or phone.strip() == ""\
+                or confirmPassword.strip() == "" or password.strip() == "":
+            return {"message": "Please ensure all fields are non-empty."}, 400
 
         if len(password) < 6:
             return {'message': 'password should be 6 characters or more.'}, 400
@@ -51,7 +52,8 @@ class UserSignUp(Resource):
 
         user = None
         try:
-            query = "select username from users where username='%s'" % username
+            query = "select username from users where username='%s'\
+             or email='%s' or phone='%s'" % (username, email, phone)
             cursor.execute(query)
             user = cursor.fetchone()
             if user is None:
@@ -70,7 +72,7 @@ model_login = api.model('Login', {'email': fields.String,
 
 class UserLogin(Resource):
 
-    @api.doc('user accounts', responses={201: 'CREATED', 400: 'BAD REQUEST', 401:'INVALID CREDENTIALS',404: 'NOT FOUND'})
+    @api.doc('user accounts', responses={201: 'CREATED', 400: 'BAD REQUEST', 401: 'INVALID CREDENTIALS', 404: 'NOT FOUND'})
     @api.expect(model_login)
     def post(self):
         """User login
