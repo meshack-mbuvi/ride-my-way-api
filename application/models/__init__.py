@@ -36,4 +36,15 @@ def create_all():
             available_space Int NOT NULL, \
             FOREIGN KEY (owner_id) REFERENCES users(user_id) )'
             cursor.execute(command)
+            try:
+                cursor.execute('SELECT 1 from {}' . format('requests'))
+            except Exception as e:
+                command = 'CREATE TABLE requests (req_id serial PRIMARY KEY,\
+                       date_created timestamp,\
+                       owner_id serial,\
+                       user_id serial,\
+                       status boolean default null, \
+                       FOREIGN KEY (owner_id) REFERENCES users(user_id), \
+                       FOREIGN KEY (user_id) REFERENCES users(user_id) )'
+                cursor.execute(command)
     return

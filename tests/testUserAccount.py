@@ -42,9 +42,9 @@ class SignTests(unittest.TestCase):
             "email": "meshmbuvi@gmail.com",
             "username": "mbuvi",
             "driver": True,
-            "password": "",
+            "password": "  ",
             "phone": "0719800509",
-            "confirm password": ""
+            "confirm password": "  "
         }
 
         self.data_with_short_password = {
@@ -117,7 +117,7 @@ class SignTests(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],
-                         'All fields are required.')
+                         'Please ensure all fields are non-empty.')
 
     def test_password_cannot_be_less_than_six_characters(self):
         """test user cannot sign up with empty fields."""
@@ -177,7 +177,7 @@ class LoginTests(unittest.TestCase):
         self.login_with_empty_password = {
             "email": "meshmbuvi@gmail.com",
             "username": "musyoka",
-            "password": " "
+            "password": ""
         }
 
     def tearDown(self):
@@ -203,7 +203,7 @@ class LoginTests(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertIn('token', response_data)
 
-    def test_user_cannot_login_with_invalid_details(self):
+    def test_user_cannot_login_with_invalid_password(self):
         """test user cannot login with invalid details"""
         response = self.app.post('/api/v1/auth/login',
                                  data=json.dumps(self.invalid_password),
@@ -211,7 +211,7 @@ class LoginTests(unittest.TestCase):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response_data['message'],
-                         'Invalid crententials.')
+                         'Invalid password.')
 
     def test_non_existing_user_cannot_login(self):
         """test non-existing user cannot login"""
