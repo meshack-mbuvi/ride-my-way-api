@@ -85,8 +85,8 @@ class UserLogin(Resource):
         username = userData['username']
         password = userData['password']
 
-        if username == "" or password == "":
-            return {"message": "Invalid format."}, 400
+        if username.strip() == "" or password.strip() == "":
+            return {"message": "Password or username cannot be empty."}, 400
 
         try:
             if 'email' in userData:
