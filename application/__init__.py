@@ -7,6 +7,7 @@ from application.manage import database
 
 from application.models import create_all
 
+db = database
 
 def create_app(config, database=None):
     app = Flask(__name__, instance_relative_config=True)

@@ -21,3 +21,4 @@ class User():
              {},{})". format(self.phone, self.driver)
         cursor.execute(query)
         connection.commit()
+        return
