@@ -93,6 +93,21 @@ class RidesOfferTests(unittest.TestCase):
         self.assertEqual(response_data['message'],
                          'ride offer added successfully.')
 
+    def test_cannot_create_same_ride_offer_twice(self):
+        """test user cannot create a ride."""
+        self.app.post('/api/v1/users/rides',
+                      data=json.dumps(self.ride),
+                      content_type='application/json',
+                      headers=self.headers)
+        response = self.app.post('/api/v1/users/rides',
+                                 data=json.dumps(self.ride),
+                                 content_type='application/json',
+                                 headers=self.headers)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response_data['message'],
+                         'offer exists.')
+
     def test_cannot_create_ride_with_wrong_date_time(self):
         """Tests that date is parsed in the specified format
         The date format is Month day Year hour:minutes."""
@@ -104,6 +119,17 @@ class RidesOfferTests(unittest.TestCase):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],
                          "use correct format for date and time.")
+
+    def test_user_cannot_create_a_past_ride(self):
+        """test cannot create a past ride """
+        response = self.app.post('/api/v1/users/rides',
+                                 data=json.dumps(self.past_ride),
+                                 content_type='application/json',
+                                 headers=self.headers)
+        self.assertEqual(response.status_code, 403)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data['message'],
+                         "Cannot create an expired ride")
 
     def test_cannot_create_ride_without_details(self):
         ride = {}
@@ -129,17 +155,57 @@ class RidesOfferTests(unittest.TestCase):
     def test_get_all_rides(self):
         """test user can get available ride offers."""
         # Create a ride offer to be sure there is an offer
-        response = self.app.post('/api/v1/users/rides',
-                                 data=json.dumps(self.ride),
-                                 content_type='application/json',
-                                 headers=self.headers)
+        self.app.post('/api/v1/users/rides',
+                      data=json.dumps(self.ride),
+                      content_type='application/json',
+                      headers=self.headers)
         response = self.app.get('/api/v1/rides/',
                                 content_type='application/json',
                                 headers=self.headers)
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.get_data().decode('utf-8'))
-        print(response_data)
         self.assertTrue(response_data[0] is not None)
+
+    def test_get_a_ride(self):
+        """test user can get a single ride offer.
+        Create a ride offer and retrieve it"""
+        # Create a ride offer to be sure there is an offer
+        self.app.post('/api/v1/users/rides',
+                      data=json.dumps(self.ride),
+                      content_type='application/json',
+                      headers=self.headers)
+        # Get ana offer, assuming the order is assigned id=1
+        response = self.app.get('/api/v1/rides/1',
+                                content_type='application/json',
+                                headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data[0]['id'], 1)
+
+    def test_get_ride_that_does_not_exist(self):
+        """test user cannot get a ride that does not exist."""
+        id = -1
+        response = self.app.get('/api/v1/rides/{}'.format(id),
+                                content_type='application/json',
+                                headers=self.headers)
+        self.assertEqual(response.status_code, 404)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data['message'], 'Ride does not exist')
+
+    def test_user_can_request_a_ride(self):
+        """test user can join a ride."""
+        # create a ride to be sure a ride exists.
+        response = self.app.post('/api/v1/users/rides',
+                                 data=json.dumps(self.ride),
+                                 content_type='application/json',
+                                 headers=self.headers)
+        response = self.app.post('/api/v1/rides/1/requests',
+                                 content_type='application/json',
+                                 headers=self.headers)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response_data['message'],
+                         "Your request has been send.")
 
 if __name__ == '__main__':
     unittest.main()

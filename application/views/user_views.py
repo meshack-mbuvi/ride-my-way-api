@@ -31,13 +31,13 @@ class UserSignUp(Resource):
     @api.expect(usermodel)
     def post(self):
         """User sign up"""
-        data = request.get_json()
+        userData = request.get_json()
+        username = userData['username']
+        confirmPassword = userData['confirm password']
+        phone = userData['phone']
+        email = userData['email']
+        password = userData["password"]
 
-        username = data['username']
-        confirmPassword = data['confirm password']
-        phone = data['phone']
-        email = data['email']
-        password = data["password"]
 
         if username == "" or email == "" or phone == ""\
                 or confirmPassword == "" or password == "":
@@ -58,12 +58,12 @@ class UserSignUp(Resource):
             cursor.execute(query)
             user = cursor.fetchone()
             if user is None:
-                userObject = User(data)
+                data = request.get_json()
+                userObject = User(userData)
                 userObject.save()
                 return {'message': 'Account created.'}, 201
             return {'message': 'User exists.'}, 409
         except Exception as e:
-            print(e)
             return {'message': 'We are unable to create your account at the moment.'}, 404
 
 # model for login
@@ -97,6 +97,96 @@ class UserLogin(Resource):
             else:
                 query = "select password from users where username='{}'". format(
                     username)
+                cursor.execute(query)
+                user = cursor.fetchone()
+
+            if check_password_hash(user[0], password):
+                token = create_access_token(identity=username)
+                return {'message': 'logged in.', 'token': token}, 201
+            else:
+                return {'message': 'Invalid crententials.'}, 401
+        except Exception as e:
+            return {'message': 'User not found.'}, 404
+
+# model for login
+model_login = api.model('Login', {'email': fields.String,
+                                  'password': fields.String})
+
+
+class UserLogin(Resource):
+
+    @api.doc('user accounts',
+             responses={201: 'CREATED', 400: 'BAD REQUEST',
+                        401: 'INVALID CREDENTIALS', 404: 'NOT FOUND'})
+    @api.expect(model_login)
+    def post(self):
+        """User login
+        :returns JWT after successful login
+        """
+
+        data = request.get_json()
+        username = data['username']
+        password = data['password']
+
+        if username == "" or password == "":
+            return {"message": "Invalid format."}, 400
+
+        try:
+            query = None
+            user = None
+            if 'email' in data:
+                email = data['email']
+                query = "select password from users where email='{}'". format(
+                    email)
+                cursor.execute(query)
+                user = cursor.fetchone()
+            else:
+                query = "select password from users where username='{}'" . format(username)
+                cursor.execute(query)
+                user = cursor.fetchone()
+
+            if check_password_hash(user[0], password):
+                token = create_access_token(identity=username)
+                return {'message': 'logged in.', 'token': token}, 201
+            else:
+                return {'message': 'Invalid crententials.'}, 401
+        except Exception as e:
+            return {'message': 'User not found.'}, 404
+
+# model for login
+model_login = api.model('Login', {'email': fields.String,
+                                  'password': fields.String})
+
+
+class UserLogin(Resource):
+
+    @api.doc('user accounts',
+             responses={201: 'CREATED', 400: 'BAD REQUEST',
+                        401: 'INVALID CREDENTIALS', 404: 'NOT FOUND'})
+    @api.expect(model_login)
+    def post(self):
+        """User login
+        :returns JWT after successful login
+        """
+
+        userData = request.get_json()
+        username = userData['username']
+        password = userData['password']
+
+        if username == "" or password == "":
+            return {"message": "Invalid format."}, 400
+
+        try:
+            if 'email' in userData:
+                email = userData['email']
+                query = "select password from users where email='{}'". format(
+                    email)
+                cursor.execute(query)
+                user = cursor.fetchone()
+            else:
+                query = \
+                    "select password from users where username='{}'". format(
+                        username)
                 cursor.execute(query)
                 user = cursor.fetchone()
 

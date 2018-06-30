@@ -12,10 +12,11 @@ class database():
         dbname = dbname
         connection = connect(database=dbname,
                              user=user, host=host, password=password)
+
         connection.autocommit = True
         return connection
 
-    def create_all(self, dbname=dbname):
+    def create_all(self):
         # Create all tables here
         connection = self.connect(dbname)
         commands = (
@@ -28,7 +29,8 @@ class database():
 
             'DROP TABLE "rides" CASCADE',
             'CREATE TABLE rides (ride_id serial PRIMARY KEY, \
-                       owner_id serial, \      start_point varchar(255), \
+                       owner_id serial, \
+                       start_point varchar(255), \
                        destination varchar(255), \
                        start_time varchar(50) NOT NULL, \
                        route varchar(255) NOT NULL, \

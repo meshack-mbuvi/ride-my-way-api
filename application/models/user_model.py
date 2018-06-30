@@ -16,8 +16,9 @@ class User():
 
     def save(self):
         # insert new record
-        query = "INSERT INTO users (username,email,password,phone,driver)\
-        VALUES ('" + self.username + "', '" + self.email + "', '" + self.password + "', \
+        query = "INSERT INTO users (username,email,password,phone,driver) VALUES " \
+            "('" + self.username + "', '" + self.email + "', '" + self.password + "', \
              {},{})". format(self.phone, self.driver)
         cursor.execute(query)
         connection.commit()
+        return

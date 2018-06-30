@@ -11,14 +11,21 @@ class RideOffer(object):
     available space: Int available space for passengers
     requests : List holding users who request to join the ride
     """
-
     def __init__(self, ridedata):
-        self.startPoint = ridedata['start point']
+        self.start_point = ridedata['start point']
         self.destination = ridedata['destination']
         date = datetime.strptime(ridedata['start time'], '%B %d %Y %I:%M%p')
-        self.startTime = datetime.strftime(date, '%B %d %Y %I:%M%p')
+        self.start_time = datetime.strftime(date, '%B %d %Y %I:%M%p')
         self.route = ridedata['route']
-        self.availableSpace = ridedata['available space']
+        self.available_space = ridedata['available space']
+
+    def __init__(self, ridedata):
+        self.start_point = ridedata['start point']
+        self.destination = ridedata['destination']
+        date = datetime.strptime(ridedata['start time'], '%B %d %Y %I:%M%p')
+        self.start_time = datetime.strftime(date, '%B %d %Y %I:%M%p')
+        self.route = ridedata['route']
+        self.available_space = ridedata['available space']
 
     def save(self, current_user):
         # insert new record
@@ -26,11 +33,11 @@ class RideOffer(object):
         route,available_space) \
                 VALUES ((SELECT user_id from users where username ='{}'), '{}',\
                         '{}','{}','{}', '{}')" . format(current_user,
-                                                        self.startPoint,
+                                                        self.start_point,
                                                         self.destination,
-                                                        self.startTime,
+                                                        self.start_time,
                                                         self.route,
-                                                        self.availableSpace)
+                                                        self.available_space)
         cursor.execute(query)
         connection.commit()
 
