@@ -12,10 +12,11 @@ class database():
         dbname = dbname
         connection = connect(database=dbname,
                              user=user, host=host, password=password)
+
         connection.autocommit = True
         return connection
 
-    def create_all(self, dbname=dbname):
+    def create_all(self):
         # Create all tables here
         connection = self.connect(dbname)
         commands = (

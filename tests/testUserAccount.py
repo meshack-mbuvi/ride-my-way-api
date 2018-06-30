@@ -177,7 +177,7 @@ class LoginTests(unittest.TestCase):
         self.login_with_empty_password = {
             "email": "meshmbuvi@gmail.com",
             "username": "musyoka",
-            "password": ""
+            "password": " "
         }
 
     def tearDown(self):
