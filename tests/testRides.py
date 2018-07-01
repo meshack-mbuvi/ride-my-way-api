@@ -204,7 +204,6 @@ class RidesOfferTests(unittest.TestCase):
                                  content_type='application/json',
                                  headers=self.headers_for_passenger)
         response_data = json.loads(response.get_data().decode('utf-8'))
-        print(response_data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response_data['message'],
                          "Your request has been send.")
@@ -246,6 +245,30 @@ class RidesOfferTests(unittest.TestCase):
         self.assertEqual(response.status_code, 404)
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertNotIn('requests', response_data)
+
+    def test_driver_can_accept_user_request(self):
+        """test that a driver can accept users request."""
+        self.app.post('/api/v1/users/rides',
+                      data=json.dumps(self.ride),
+                      content_type='application/json',
+                      headers=self.headers)
+        # passenger requests to join offer
+        self.app.post('/api/v1/rides/1/requests',
+                                 content_type='application/json',
+                                 headers=self.headers_for_passenger)
+        data = {"action": "accept"}
+        # driver accepts ride offer
+        response = self.app.put('/api/v1/users/rides/1/requests/1',
+                                data=json.dumps(data),
+                                content_type='application/json',
+                                headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.app.get('/api/v1/users/rides/1/requests',
+                                content_type='application/json',
+                                headers=self.headers)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data[0]['status'], 'Accepted')
 
 
 if __name__ == '__main__':

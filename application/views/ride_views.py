@@ -65,7 +65,6 @@ class Rides(Resource):
                         201: 'Created', 400: 'BAD FORMAT',
                         401: 'UNAUTHORIZED'})
     @api.expect(ride)
-    @api.header('Authorization', 'Some expected header', required=True)
     @jwt_required
     def post(self):
         """Creates a new ride offer"""
@@ -192,10 +191,18 @@ class Requests(Resource):
     def get(self, ride_id):
         """Retrieves all requests to a given ride"""
         try:
+            # get owner id
+            query = "SELECT user_id from users where username='{}'"\
+                 .format(get_jwt_identity()
+                        )
+            cursor.execute(query)
+            row = cursor.fetchone()
+            user_id = row[0]
+
             query = "SELECT username,phone,start_point,destination,\
             start_time,status from requests INNER JOIN rides \
-                    ON rides.ride_id = requests.ride_id INNER JOIN \
-                    users on users.user_id = requests.user_id"
+                    ON requests.ride_id = '{}' INNER JOIN \
+                    users on users.user_id = requests.user_id" . format(ride_id)
             cursor.execute(query)
             rows = cursor.fetchall()
             if len(rows) > 0:
@@ -210,7 +217,35 @@ class Requests(Resource):
             return {'message': 'Request not successful.'}, 500
 
 
+class RequestActions(Resource):
+
+    @api.doc('view user requests to a given ride offer',
+             responses={200: 'OK', 404: 'NOT FOUND', 401: 'UNAUTHORIZED'},
+             params={'rideId': 'Id for ride user wants to view', 
+             'requestId': 'Id identifying the request'})
+    @jwt_required
+    def put(self, rideId, requestId):
+        try:
+            action = request.get_json()
+            print(request,request.get_json())
+            act = True
+            if action["action"].lower() == 'accept':
+                act = True
+            else:
+                act = False
+
+            query = "UPDATE requests SET status = '{}'\
+             where requests.req_id = '{}' and requests.ride_id = '{}'" \
+             . format(act, int(requestId), int(rideId))
+            cursor.execute(query)
+
+        except Exception as e:
+            print(e)
+            raise e
+
+
 api.add_resource(Rides, '/users/rides')
 api.add_resource(AllRides, '/rides')
 api.add_resource(JoinRide, '/rides/<ride_id>/requests')
 api.add_resource(Requests, '/users/rides/<ride_id>/requests')
+api.add_resource(RequestActions, '/users/rides/<rideId>/requests/<requestId>')
