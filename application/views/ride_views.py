@@ -210,7 +210,6 @@ class Requests(Resource):
             return {'message': 'Ride does not exist'}, 404
         except Exception as e:
             return {'message': 'Request not successful.'}, 500
-            
 
 
 api.add_resource(Rides, '/users/rides')
