@@ -157,7 +157,8 @@ class JoinRide(Resource):
                 return {'message': 'That ride does not exist'}, 404
             time = (row[4])
             if user_id == row[1]:
-                return {'message': 'You cannot request to join your own offer'}, 403
+                return {'message':
+                        'You cannot request to join your own offer'}, 403
             if time > datetime.now():
                 # check whether users has alread requested given ride offer
                 query = "SELECT * from requests where user_id = (SELECT users.user_id \
@@ -193,7 +194,7 @@ class Requests(Resource):
         try:
             # get owner id
             query = "SELECT user_id from users where username='{}'"\
-                 .format(get_jwt_identity()
+                .format(get_jwt_identity()
                         )
             cursor.execute(query)
             row = cursor.fetchone()
@@ -202,7 +203,8 @@ class Requests(Resource):
             query = "SELECT username,phone,start_point,destination,\
             start_time,status from requests INNER JOIN rides \
                     ON requests.ride_id = '{}' INNER JOIN \
-                    users on users.user_id = requests.user_id" . format(ride_id)
+                    users on users.user_id = requests.user_id" \
+                    . format(ride_id)
             cursor.execute(query)
             rows = cursor.fetchall()
             if len(rows) > 0:
@@ -221,13 +223,12 @@ class RequestActions(Resource):
 
     @api.doc('view user requests to a given ride offer',
              responses={200: 'OK', 404: 'NOT FOUND', 401: 'UNAUTHORIZED'},
-             params={'rideId': 'Id for ride user wants to view', 
-             'requestId': 'Id identifying the request'})
+             params={'rideId': 'Id for ride user wants to view',
+                     'requestId': 'Id identifying the request'})
     @jwt_required
     def put(self, rideId, requestId):
         try:
             action = request.get_json()
-            print(request,request.get_json())
             act = True
             if action["action"].lower() == 'accept':
                 act = True
@@ -240,8 +241,7 @@ class RequestActions(Resource):
             cursor.execute(query)
 
         except Exception as e:
-            print(e)
-            raise e
+            return {'message': 'Request not successful.'}, 500
 
 
 api.add_resource(Rides, '/users/rides')
