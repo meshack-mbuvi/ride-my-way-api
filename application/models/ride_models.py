@@ -19,14 +19,6 @@ class RideOffer(object):
         self.route = ridedata['route']
         self.available_space = ridedata['available space']
 
-    def __init__(self, ridedata):
-        self.start_point = ridedata['start point']
-        self.destination = ridedata['destination']
-        date = datetime.strptime(ridedata['start time'], '%B %d %Y %I:%M%p')
-        self.start_time = datetime.strftime(date, '%B %d %Y %I:%M%p')
-        self.route = ridedata['route']
-        self.available_space = ridedata['available space']
-
     def save(self, current_user):
         # insert new record
         query = "INSERT INTO rides (owner_id,start_point,destination,start_time,\
