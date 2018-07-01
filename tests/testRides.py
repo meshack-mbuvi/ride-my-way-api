@@ -45,6 +45,33 @@ class RidesOfferTests(unittest.TestCase):
         self.invalid_token = {
             'Authorization': 'Bearer {}'.format((token)[:-1] + '0')}
 
+        # create second user
+        self.passenger = {
+            "email": "meshmbuvi@gmail.comqw",
+            "username": "musyoka",
+            "driver": False,
+            "password": "mbuvi1",
+            "phone": "0719800509",
+            "confirm password": "mbuvi1"
+        }
+        response = self.app.post('/api/v1/auth/signup',
+                                 data=json.dumps(self.passenger),
+                                 content_type='application/json')
+
+        # login to get token
+        passenger_login_data = {
+            "username": "musyoka",
+            "password": "mbuvi1"
+        }
+        response = self.app.post('/api/v1/auth/login',
+                                 data=json.dumps(passenger_login_data),
+                                 content_type='application/json')
+        response_data = json.loads(response.get_data().decode('utf-8'))
+
+        passenger_token = response_data['token']
+        self.headers_for_passenger = {
+            'Authorization': 'Bearer {}'.format(passenger_token)}
+
         self.ride = {
             "start point": "Witeithye",
             "destination": "Ngara",
@@ -115,7 +142,7 @@ class RidesOfferTests(unittest.TestCase):
                                  data=json.dumps(self.ride_with_wrong_date),
                                  content_type='application/json',
                                  headers=self.headers)
-        
+
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],
                          "use correct format for date and time.")
@@ -169,14 +196,15 @@ class RidesOfferTests(unittest.TestCase):
     def test_user_can_request_a_ride(self):
         """test user can join a ride."""
         # create a ride to be sure a ride exists.
-        response = self.app.post('/api/v1/users/rides',
-                                 data=json.dumps(self.ride),
-                                 content_type='application/json',
-                                 headers=self.headers)
+        self.app.post('/api/v1/users/rides',
+                      data=json.dumps(self.ride),
+                      content_type='application/json',
+                      headers=self.headers)
         response = self.app.post('/api/v1/rides/1/requests',
                                  content_type='application/json',
-                                 headers=self.headers)
+                                 headers=self.headers_for_passenger)
         response_data = json.loads(response.get_data().decode('utf-8'))
+        print(response_data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response_data['message'],
                          "Your request has been send.")
@@ -190,6 +218,34 @@ class RidesOfferTests(unittest.TestCase):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],
                          "That ride does not exist")
+
+    def test_user_can_view_user_requests_to_join_a_ride(self):
+        """Test users can view users requests to join a ride offer."""
+        # Create an offer
+        self.app.post('/api/v1/users/rides',
+                      data=json.dumps(self.ride),
+                      content_type='application/json',
+                      headers=self.headers)
+        # request to join the ride
+        self.app.post('/api/v1/rides/1/requests',
+                      content_type='application/json',
+                      headers=self.headers_for_passenger)
+        # view user requests
+        response = self.app.get('/api/v1/users/rides/1/requests',
+                                content_type='application/json',
+                                headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertTrue(len(response_data) > 0)
+
+    def test_user_cannot_view_user_requests_for_no_existing_offer(self):
+        """test user cannot view user requests for non existing ride offer. """
+        response = self.app.get('/api/v1/users/rides/-1/requests',
+                                content_type='application/json',
+                                headers=self.headers)
+        self.assertEqual(response.status_code, 404)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertNotIn('requests', response_data)
 
 
 if __name__ == '__main__':

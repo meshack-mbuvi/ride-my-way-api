@@ -146,7 +146,8 @@ class JoinRide(Resource):
             current_user = get_jwt_identity()
             # Get user ID
             query = "SELECT users.user_id \
-                            from users where username='{}'" . format(current_user)
+                            from users where username='{}'"\
+                            . format(current_user)
             cursor.execute(query)
             user_row = cursor.fetchone()
             user_id = user_row[0]
@@ -155,7 +156,7 @@ class JoinRide(Resource):
                 ride_id)
             cursor.execute(query)
             row = cursor.fetchone()
-            time = str_to_date(row[4])
+            time = (row[4])
 
             if user_id == row[1]:
                 return {'message': 'You cannot request to join your own offer'}, 403
@@ -184,6 +185,35 @@ class JoinRide(Resource):
             return {'message': 'That ride does not exist'}, 404
 
 
+class Requests(Resource):
+
+    @api.doc('view user requests to a given ride offer',
+             responses={200: 'OK', 404: 'NOT FOUND', 401: 'UNAUTHORIZED'},
+             params={'ride_id': 'Id for ride user wants to view'})
+    @jwt_required
+    def get(self, ride_id):
+        """Retrieves all requests to a given ride"""
+        try:
+            query = "SELECT username,phone,start_point,destination,\
+            start_time,status from requests INNER JOIN rides \
+                    ON rides.ride_id = requests.ride_id INNER JOIN \
+                    users on users.user_id = requests.user_id"
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            if len(rows) > 0:
+                return jsonify([{'name of user': row[0], 'user phone': row[1],
+                                 'pick up point': row[2],
+                                 'Destination': row[3],
+                                 'start time': row[4],
+                                 'status': 'Accepted' if row[5] is True
+                                 else 'Pending'} for row in rows])
+            return {'message': 'Ride does not exist'}, 404
+        except Exception as e:
+            return {'message': 'Request not successful.'}, 500
+            
+
+
 api.add_resource(Rides, '/users/rides')
 api.add_resource(AllRides, '/rides')
 api.add_resource(JoinRide, '/rides/<ride_id>/requests')
+api.add_resource(Requests, '/users/rides/<ride_id>/requests')
