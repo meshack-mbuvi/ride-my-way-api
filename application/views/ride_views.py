@@ -104,9 +104,7 @@ class Rides(Resource):
                 return {'message':
                         'use correct format for date and time.'}, 400
             except Exception as e:
-                return {'message':
-                        'We could not process your request. \
-                        Please try again later'}
+                return {'message': 'Request not successful'}, 500
         else:
             return {'message':
                     'make sure you provide all required fields.'}, 400
@@ -130,7 +128,7 @@ class AllRides(Resource):
                  'available space': row[6]}
                 for row in rows])
         except Exception as e:
-            raise e
+            return {'message': 'Request not successful'}, 500
 
 
 class JoinRide(Resource):
@@ -182,7 +180,7 @@ class JoinRide(Resource):
                         'The ride requested has already expired'}, 403
         except Exception as e:
             print(e)
-            return {'message': 'That ride does not exist'}, 404
+            return {'message': 'Request not successful'}, 500
 
 
 class Requests(Resource):

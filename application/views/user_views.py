@@ -64,7 +64,7 @@ class UserSignUp(Resource):
                 return {'message': 'Account created.'}, 201
             return {'message': 'User exists.'}, 409
         except Exception as e:
-            return {'message': 'We are unable to create your account at the moment.'}, 404
+            return {'message': 'Request not successful'}, 500
 
 # model for login
 model_login = api.model('Login', {'email': fields.String,
@@ -73,7 +73,11 @@ model_login = api.model('Login', {'email': fields.String,
 
 class UserLogin(Resource):
 
-    @api.doc('user accounts', responses={201: 'CREATED', 400: 'BAD REQUEST', 401: 'INVALID CREDENTIALS', 404: 'NOT FOUND'})
+    @api.doc('user accounts',
+             responses={201: 'CREATED',
+                        400: 'BAD REQUEST',
+                        401: 'INVALID CREDENTIALS',
+                        404: 'NOT FOUND'})
     @api.expect(model_login)
     def post(self):
         """User login
@@ -94,19 +98,17 @@ class UserLogin(Resource):
                 query = "select password from users where email='{}'". format(
                     email)
             else:
-                query = "select password from users where username='{}'". format(
-                    username)
+                query = "select password from users where username='{}'"\
+                    . format(username)
             cursor.execute(query)
             user = cursor.fetchone()
-            print(user)
-
             if check_password_hash(user[0], password):
                 token = create_access_token(identity=username)
                 return {'message': 'logged in.', 'token': token}, 201
             else:
                 return {'message': 'Invalid password.'}, 401
         except Exception as e:
-            return {'message': 'User not found.'}, 404
+            return {'message': 'Request not successful'}, 500
 
 
 api.add_resource(UserSignUp, '/auth/signup')
