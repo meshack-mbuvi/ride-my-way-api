@@ -154,8 +154,9 @@ class JoinRide(Resource):
                 ride_id)
             cursor.execute(query)
             row = cursor.fetchone()
+            if row is None:
+                return {'message': 'That ride does not exist'}, 404
             time = (row[4])
-
             if user_id == row[1]:
                 return {'message': 'You cannot request to join your own offer'}, 403
             if time > datetime.now():
@@ -179,8 +180,7 @@ class JoinRide(Resource):
                 return {'message':
                         'The ride requested has already expired'}, 403
         except Exception as e:
-            print(e)
-            return {'message': 'Request not successful'}, 500
+            return {'message': 'Request not successful.'}, 500
 
 
 class Requests(Resource):

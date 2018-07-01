@@ -102,6 +102,8 @@ class UserLogin(Resource):
                     . format(username)
             cursor.execute(query)
             user = cursor.fetchone()
+            if user is None:
+                return {'message': 'User not found.'}, 404
             if check_password_hash(user[0], password):
                 token = create_access_token(identity=username)
                 return {'message': 'logged in.', 'token': token}, 201
