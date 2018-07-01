@@ -33,6 +33,5 @@ class RideOffer(object):
         cursor.execute(query)
         connection.commit()
 
-
     def fetch_all(self):
         pass

@@ -109,6 +109,5 @@ class UserLogin(Resource):
         except Exception as e:
             return {'message': 'User not found.'}, 404
 
-
 api.add_resource(UserSignUp, '/auth/signup')
 api.add_resource(UserLogin, '/auth/login')
