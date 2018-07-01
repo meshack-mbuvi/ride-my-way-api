@@ -115,7 +115,7 @@ class RidesOfferTests(unittest.TestCase):
                                  data=json.dumps(self.ride_with_wrong_date),
                                  content_type='application/json',
                                  headers=self.headers)
-        
+
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],
                          "use correct format for date and time.")
@@ -166,6 +166,20 @@ class RidesOfferTests(unittest.TestCase):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertTrue(response_data[0] is not None)
 
+    def test_get_a_rides(self):
+        """test user can get available ride offers."""
+        # Create a ride offer to be sure there is an offer
+        response = self.app.post('/api/v1/users/rides',
+                                 data=json.dumps(self.ride),
+                                 content_type='application/json',
+                                 headers=self.headers)
+        response = self.app.get('/api/v1/rides/1',
+                                content_type='application/json',
+                                headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertTrue(response_data[0] is not None)
+
     def test_user_can_request_a_ride(self):
         """test user can join a ride."""
         # create a ride to be sure a ride exists.
@@ -180,6 +194,25 @@ class RidesOfferTests(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response_data['message'],
                          "Your request has been send.")
+
+    def test_user_cannot_request_same_ride_twice(self):
+        """test user cannot request to join a ride more than once."""
+        # create a ride to be sure a ride exists.
+        response = self.app.post('/api/v1/users/rides',
+                                 data=json.dumps(self.ride),
+                                 content_type='application/json',
+                                 headers=self.headers)
+        # Requests same ride more than once
+        self.app.post('/api/v1/rides/1/requests',
+                      content_type='application/json',
+                      headers=self.headers)
+        response = self.app.post('/api/v1/rides/1/requests',
+                                 content_type='application/json',
+                                 headers=self.headers)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response_data['message'],
+                         "You already requested this ride.")
 
     def test_user_cannot_request_a_non_existing_ride(self):
         """test user cannot request a non existing ride offer."""

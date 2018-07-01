@@ -133,6 +133,32 @@ class AllRides(Resource):
             raise e
 
 
+class SingleRide(Resource):
+
+    @api.doc('Get Available rides',
+             params={'ride_id': 'Id for a single ride offer'},
+             responses={200: 'OK', 404: 'NOT FOUND'})
+    @jwt_required
+    def get(self, ride_id):
+        """Retrieves all available rides"""
+        try:
+            query = "SELECT * from rides where rides.ride_id = '{}'"\
+                . format(ride_id)
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
+            if len(rows) > 0:
+                return jsonify([
+                    {'id': row[0], 'start point': row[2],
+                     'destination': row[3], 'start_time': row[4],
+                     'route': row[5],
+                     'available space': row[6]}
+                    for row in rows])
+            return {'message': 'Offer not found'}, 404
+        except Exception as e:
+            raise e
+
+
 class JoinRide(Resource):
 
     @api.doc('Request to join a ride offer',
@@ -178,4 +204,5 @@ class JoinRide(Resource):
 
 api.add_resource(Rides, '/users/rides')
 api.add_resource(AllRides, '/rides')
+api.add_resource(SingleRide, '/rides/<string:ride_id>')
 api.add_resource(JoinRide, '/rides/<ride_id>/requests')
