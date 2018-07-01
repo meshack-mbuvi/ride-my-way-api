@@ -23,7 +23,7 @@ def create_all():
         email varchar(50) NOT NULL, \
         password varchar(255) NOT NULL, \
         phone varchar(255) NOT NULL, driver boolean )'
-        cursor.execute(command)        
+        cursor.execute(command)       
         try:
             cursor.execute('SELECT 1 from {}' . format('rides'))
         except Exception as e:
@@ -31,7 +31,7 @@ def create_all():
             owner_id serial, \
             start_point varchar(255), \
             destination varchar(255), \
-            start_time varchar(50) NOT NULL, \
+            start_time timestamp NOT NULL, \
             route varchar(255) NOT NULL, \
             available_space Int NOT NULL, \
             FOREIGN KEY (owner_id) REFERENCES users(user_id) )'

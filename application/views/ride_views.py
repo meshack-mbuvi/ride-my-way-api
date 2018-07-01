@@ -144,12 +144,21 @@ class JoinRide(Resource):
         try:
             # sample user
             current_user = get_jwt_identity()
+            # Get user ID
+            query = "SELECT users.user_id \
+                            from users where username='{}'" . format(current_user)
+            cursor.execute(query)
+            user_row = cursor.fetchone()
+            user_id = user_row[0]
             # check whether ride offer is expired
             query = "SELECT * from rides where ride_id = '{}'" . format(
                 ride_id)
             cursor.execute(query)
             row = cursor.fetchone()
-            time = (row[4])
+            time = str_to_date(row[4])
+
+            if user_id == row[1]:
+                return {'message': 'You cannot request to join your own offer'}, 403
             if time > datetime.now():
                 # check whether users has alread requested given ride offer
                 query = "SELECT * from requests where user_id = (SELECT users.user_id \
@@ -160,10 +169,9 @@ class JoinRide(Resource):
                 if result is None:
                     # save user requests now
                     query = "INSERT INTO requests (date_created, ride_id, user_id, status)\
-                                values('{}', '{}', (SELECT users.user_id \
-                                from users where username='{}'), '{}')"\
+                                values('{}', '{}', '{}', '{}')"\
                                  . format(datetime.now(), ride_id,
-                                          current_user, False)
+                                          user_id, False)
                     cursor.execute(query)
                     return {'message': 'Your request has been send.'}, 201
                 # user has already requested to join this ride offer
