@@ -31,17 +31,17 @@ class database():
                        owner_id serial, \
                        start_point varchar(255), \
                        destination varchar(255), \
-                       start_time varchar(50) NOT NULL, \
+                       start_time timestamp NOT NULL, \
                        route varchar(255) NOT NULL, \
                        available_space Int NOT NULL, \
                        FOREIGN KEY (owner_id) REFERENCES users(user_id) )',
             'DROP TABLE "requests" CASCADE',
             'CREATE TABLE requests (req_id serial PRIMARY KEY,\
                        date_created timestamp,\
-                       owner_id serial,\
+                       ride_id serial,\
                        user_id serial,\
                        status boolean, \
-                       FOREIGN KEY (owner_id) REFERENCES users(user_id), \
+                       FOREIGN KEY (ride_id) REFERENCES rides(ride_id), \
                        FOREIGN KEY (user_id) REFERENCES users(user_id) )'
         )
 

@@ -83,7 +83,7 @@ class Rides(Resource):
                 # set id for the ride offer
 
                 start_time = convert_date(data['start time'])
-                if not start_time == '':
+                if start_time is not None:
                     query = "SELECT * from rides where start_point='{}'\
                      and destination = '{}' and start_time='{}' \
                      and owner_id=(SELECT user_id from users \
@@ -98,15 +98,15 @@ class Rides(Resource):
                         ride_offer = RideOffer(data)
                         # save data here
                         ride_offer.save(current_user)
-                        response = {'message': 'ride offer added successfully.',
-                                    }
-                        return response, 201
+                        return {'message':
+                                'ride offer added successfully.'}, 201
                     return {'message': 'offer exists.'}, 409
                 return {'message':
                         'use correct format for date and time.'}, 400
             except Exception as e:
                 return {'message':
-                        'use correct format for date and time.'}, 400
+                        'We could not process your request. \
+                        Please try again later'}
         else:
             return {'message':
                     'make sure you provide all required fields.'}, 400
@@ -149,16 +149,25 @@ class JoinRide(Resource):
                 ride_id)
             cursor.execute(query)
             row = cursor.fetchone()
-            time = str_to_date(row[4])
+            time = (row[4])
             if time > datetime.now():
-                # save user requests now
-                query = "INSERT INTO requests (date_created, owner_id, user_id, status)\
-                            values('{}', '{}', (SELECT users.user_id \
-                            from users where username='{}'), '{}')"\
-                             . format(datetime.now(), row[1],
-                                      current_user, False)
+                # check whether users has alread requested given ride offer
+                query = "SELECT * from requests where user_id = (SELECT users.user_id \
+                            from users where username='{}') and ride_id = {}"\
+                    . format(current_user, ride_id)
                 cursor.execute(query)
-                return {'message': 'Your request has been send.'}, 201
+                result = cursor.fetchone()
+                if result is None:
+                    # save user requests now
+                    query = "INSERT INTO requests (date_created, ride_id, user_id, status)\
+                                values('{}', '{}', (SELECT users.user_id \
+                                from users where username='{}'), '{}')"\
+                                 . format(datetime.now(), ride_id,
+                                          current_user, False)
+                    cursor.execute(query)
+                    return {'message': 'Your request has been send.'}, 201
+                # user has already requested to join this ride offer
+                return{'message': 'You already requested this ride.'}, 403
             else:
                 return {'message':
                         'The ride requested has already expired'}, 403
