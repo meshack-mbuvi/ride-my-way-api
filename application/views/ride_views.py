@@ -158,7 +158,8 @@ class JoinRide(Resource):
             time = str_to_date(row[4])
 
             if user_id == row[1]:
-                return {'message': 'You cannot request to join your own offer'}, 403
+                return {'message':
+                        'You cannot request to join your own offer'}, 403
             if time > datetime.now():
                 # check whether users has alread requested given ride offer
                 query = "SELECT * from requests where user_id = (SELECT users.user_id \
