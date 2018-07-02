@@ -233,6 +233,21 @@ class LoginTests(unittest.TestCase):
         self.assertEqual(response_data['message'],
                          'Password or username cannot be empty.')
 
+    def test_user_can_reset_password(self):
+        """test that user can reset his password or update his details"""
+        user_data = {
+            "email": "meshmbuvi@gmail.com",
+            "username": "musyoka",
+            "password": "mbuvi1",
+            "confirm password": "mbuvi1"
+        }
+        response = self.app.put('/api/v1/auth/reset_password',
+                                data=json.dumps(user_data),
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data['message'], 'password updated')
+
 
 if __name__ == '__main__':
     unittest.main()
