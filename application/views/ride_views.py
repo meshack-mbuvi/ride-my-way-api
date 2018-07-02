@@ -130,6 +130,32 @@ class AllRides(Resource):
             return {'message': 'Request not successful'}, 500
 
 
+class SingleRide(Resource):
+
+    @api.doc('Get Available rides',
+             params={'ride_id': 'Id for a single ride offer'},
+             responses={200: 'OK', 404: 'NOT FOUND'})
+    @jwt_required
+    def get(self, ride_id):
+        """Retrieves a single ride offer"""
+        try:
+            query = "SELECT * from rides where ride_id = {}"\
+                . format(ride_id)
+            cursor.execute(query)
+            rows = cursor.fetchall()
+
+            if len(rows) > 0:
+                return jsonify([
+                    {'id': row[0], 'start point': row[2],
+                     'destination': row[3], 'start_time': row[4],
+                     'route': row[5],
+                     'available space': row[6]}
+                    for row in rows])
+            return {'message': 'Offer not found'}, 404
+        except Exception as e:
+            {'message': 'Request not successful.'}, 500
+
+
 class JoinRide(Resource):
 
     @api.doc('Request to join a ride offer',
@@ -227,14 +253,14 @@ class RequestActions(Resource):
                      'requestId': 'Id identifying the request'})
     @jwt_required
     def put(self, rideId, requestId):
+        """Driver can accept or reject the ride offer."""
         try:
-            action = request.get_json()
+            data = request.get_json()
             act = True
-            if action["action"].lower() == 'accept':
+            if data['action'].lower() == 'accept':
                 act = True
             else:
                 act = False
-
             query = "UPDATE requests SET status = '{}'\
              where requests.req_id = '{}' and requests.ride_id = '{}'" \
              . format(act, int(requestId), int(rideId))
@@ -246,6 +272,7 @@ class RequestActions(Resource):
 
 api.add_resource(Rides, '/users/rides')
 api.add_resource(AllRides, '/rides')
+api.add_resource(SingleRide, '/rides/<string:ride_id>')
 api.add_resource(JoinRide, '/rides/<ride_id>/requests')
 api.add_resource(Requests, '/users/rides/<ride_id>/requests')
 api.add_resource(RequestActions, '/users/rides/<rideId>/requests/<requestId>')

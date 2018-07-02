@@ -23,7 +23,7 @@ def create_all():
         email varchar(50) NOT NULL, \
         password varchar(255) NOT NULL, \
         phone varchar(255) NOT NULL, driver boolean )'
-        cursor.execute(command)       
+        cursor.execute(command)
         try:
             cursor.execute('SELECT 1 from {}' . format('rides'))
         except Exception as e:
