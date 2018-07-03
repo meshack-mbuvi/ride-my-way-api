@@ -1,80 +1,203 @@
 FORMAT: 1A
-HOST: http://polls.apiblueprint.org/
+HOST: https://rmw-api.herokuapp.com
 
-# ridemyway
+# Ride my way-api
+Ride-my-way App is a carpooling application that provides drivers with the ability to create ride offers and passengers to join the ride offers.
 
-Polls is a simple API allowing consumers to view polls and vote in them.
+## Create account [/api/v1/auth/signup]
+### new account [POST]
 
-## Questions Collection [/questions]
+ + Request (application/json)
+        
+        
+        [
+        {
+            "email": "meshmbuvi@gmail.com",
+            "username": "musyoka",
+            "driver": true,
+            "password": "mbuvi1",
+            "phone": 719800509,
+            "confirm password": "mbuvi1"
+        }
+        ]
+        
+ + Response 201 (application/json)
 
-### List All Questions [GET]
+        201
+        Content-type:application/json
+        [
+          {
+            "message":"Account created"
+          }
+        ]
+        
+## User details [/api/v1/auth/reset]
+### reseting user password [PUT]
+
+User can change his/her account password through this endpoint
+
+
++ Request (application/json)
+
+        {
+        'username': 'mbuvi', 'new_password': 'meshack'
+        }
+        
++ Response 200 (application/json)
+        
+        {}
+        
+        
+
+## User details [/api/v1/auth/login]
+
+### user login [POST]
+
+User uses this endpoint for login. After successful login, the user is assigned a token.
+
+
++ Request (application/json)
+
+        [
+            {
+                "username":"mbuvi "," email":"meshmbuvi@gmail.com", "password":"xxxx"
+            }
+        ]
+        
++ Response 201 (application/json)
+        
+        [
+            {
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzY290Y2guaW8iLCJleHAiOjEzMDA4MTkzODAsIm5hbWUiOiJDaHJpcyBTZXZpbGxlamEiLCJhZG1pbiI6dHJ1ZX0.03f329983b86f7d9a9f5fef85305880101d5e302afafa20154d094b229f75773",
+                "message":"logged in"
+            }
+        ]
+        
+        
+
+## create new ride [/api/v1/users/rides]
+
+### New ride [POST]
+
++ Request (application/json)
+
+        [
+            {
+                "start point": "Witeithye",
+                 "destination": "Ngara",
+                 "route": "Thika superhighway",
+                 "start time": "2018 June 10 6:00AM",
+                 "available space": 3
+            }
+        ]
+    
++ Response 200 (application/json)
+
+        {
+           "message":"ride offer added successfully."
+        }
+        
+## Retrieve rides [/api/v1/rides]
+
+### Retrieve all rides [GET]
 
 + Response 200 (application/json)
 
         [
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 2048
-                    }, {
-                        "choice": "Python",
-                        "votes": 1024
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 512
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 256
-                    }
-                ]
+               "id":1,
+                "start point": "Witeithye",
+                "destination": "Ngara",
+                "route": "Thika superhighway",
+                "start time": "June 10 2018 6:00AM",
+                "available space": 10
+            },
+           {
+               "id":2,
+                "route": "Thika-Ruaka",
+                "start point": "Thika,Goingwa",
+                "destination": "Ruaka",
+                "route": "Thika superhighway,Northern By-pass",
+                "start time": "June 10 2018 6:00AM",
+                "available space": 9
             }
         ]
+    
+## Retrieve single ride offers [/api/v1/rides/1]
 
-### Create a New Question [POST]
+### GET 
 
-You may create your own question using this action. It takes a JSON
-object containing a question and a collection of answers in the
-form of choices.
++ Response 200 (application/json)
 
-+ Request (application/json)
+        [
+            {
+                "id":1,
+                "start point": "Witeithye",
+                "destination": "Ngara",
+                "route": "Thika superhighway",
+                "start time": "June 10 2018 6:00AM",
+                "available space": 10
+            }
+        ]
+    
+## JOIN Ride offer [/rides/<rideId>/requests]
 
-        {
-            "question": "Favourite programming language?",
-            "choices": [
-                "Swift",
-                "Python",
-                "Objective-C",
-                "Ruby"
-            ]
-        }
+### Join a particular ride offer [POST]
 
 + Response 201 (application/json)
 
-    + Headers
+        [
+            {
+               "message":"You request has been send."
+            }
+        ]
+    
+    
+## View user request [/api/v1/users/rides/{ride_id}/requests]
 
-            Location: /questions/2
+### GET
++ Response 200 (application/json)
 
-    + Body
+        [
+            {
+                "Destination": "Juja",
+                "name of user": "mbuvi",
+                "pick up point": "Witeithye",
+                "start time": "Mon, 11 Jun 2040 06:00:00 GMT",
+                "status": "Accepted",
+                "user phone": "719800509"
+            }
+        ]
+        
+## Act on user request [/api/v1/users/rides/{ride_id}/requests/requestId]
+
+### Accept/reject user reques [PUT]
+
++ Request (application/json)
 
             {
-                "question": "Favourite programming language?",
-                "published_at": "2015-08-05T08:40:51.620Z",
-                "choices": [
-                    {
-                        "choice": "Swift",
-                        "votes": 0
-                    }, {
-                        "choice": "Python",
-                        "votes": 0
-                    }, {
-                        "choice": "Objective-C",
-                        "votes": 0
-                    }, {
-                        "choice": "Ruby",
-                        "votes": 0
-                    }
-                ]
+            "action": "accept"
             }
+            
++ Response 200 (application/json)
+
+        [
+            {
+                "message":"Requests accepted"
+            }
+        ]
+
+
++ Request (application/json)
+
+            {
+            "action": "reject"
+            }
+            
++ Response 200 (application/json)
+
+        [
+            {
+                "message":"Requests rejected"
+            }
+        ]
