@@ -1,9 +1,7 @@
 import json
 import unittest
-from psycopg2 import connect
 
-from application import create_app, database
-from application.models import dbname, user, host, password
+from application import create_app, db
 
 
 class SignTests(unittest.TestCase):
@@ -56,7 +54,7 @@ class SignTests(unittest.TestCase):
             "confirm password": "mfcf"
         }
 
-        self.db = database()
+        self.db = db
         self.db.create_all()
 
     def tearDown(self):
@@ -138,7 +136,7 @@ class LoginTests(unittest.TestCase):
 
         self.app = create_app('testing')
         self.app = self.app.test_client()
-        self.db = database()
+        self.db = db
         self.db.create_all()
 
         self.user_data = {
@@ -150,7 +148,7 @@ class LoginTests(unittest.TestCase):
             "confirm password": "mbuvi1"
         }
         # Register user
-        response = self.app.post('/api/v1/auth/signup',
+        self.app.post('/api/v1/auth/signup',
                                  data=json.dumps(self.user_data),
                                  content_type='application/json')
         self.valid_user = {
@@ -182,7 +180,7 @@ class LoginTests(unittest.TestCase):
 
     def tearDown(self):
         self.app = None
-        self.db = database()
+        self.db = db
         self.db.create_all()
 
     def test_user_can_login(self):
@@ -194,17 +192,18 @@ class LoginTests(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertIn('token', response_data)
 
-    def test_user_can_login_with_email(self):
-        """test  user can log in with email"""
-        response = self.app.post('/api/v1/auth/login',
-                                 data=json.dumps(self.login_with_email),
-                                 content_type='application/json')
-        response_data = json.loads(response.get_data().decode('utf-8'))
-        self.assertEqual(response.status_code, 201)
-        self.assertIn('token', response_data)
-
     def test_user_cannot_login_with_invalid_password(self):
         """test user cannot login with invalid details"""
+        response = self.app.post('/api/v1/auth/login',
+                                 data=json.dumps(self.invalid_password),
+                                 content_type='application/json')
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response_data['message'],
+                         'Invalid password.')
+
+    def test_user_cannot_login_with_password_with_less_than_6_characters(self):
+        """test user cannot login with password having less than 6 characters"""
         response = self.app.post('/api/v1/auth/login',
                                  data=json.dumps(self.invalid_password),
                                  content_type='application/json')
@@ -234,7 +233,7 @@ class LoginTests(unittest.TestCase):
                          'Password or username cannot be empty.')
 
     def test_user_can_reset_password(self):
-        """test that user can reset his password or update his details"""
+        """test that user can reset his password"""
         user_data = {
             "email": "meshmbuvi@gmail.com",
             "username": "musyoka",
@@ -247,6 +246,73 @@ class LoginTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'], 'password updated')
+
+    def test_users_new_password_is_not_less_than_6_characters_long(self):
+        """test that users new passwords are not less than  6 characters long"""
+        user_data = {
+            "email": "meshmbuvi@gmail.com",
+            "username": "musyoka",
+            "password": "mbuv",
+            "confirm password": "mbuv"
+        }
+        response = self.app.put('/api/v1/auth/reset_password',
+                                data=json.dumps(user_data),
+                                content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data['message'], 'passwords should be 6 characters or more.')
+
+    def test_users_email_is_valid(self):
+        """test that users email when changing password is valid"""
+        user_data = {
+            "email": "meshmbuvi",
+            "username": "musyoka",
+            "password": "mbuvi1",
+            "confirm password": "mbuvi1"
+        }
+        response = self.app.put('/api/v1/auth/reset_password',
+                                data=json.dumps(user_data),
+                                content_type='application/json')
+        # self.assertEqual(response.status_code, 400)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data['message'], 'Email is invalid')
+
+    def test_user_passwords_match(self):
+        """test that users email when changing password is valid"""
+        user_data = {
+            "email": "meshmbuvi@gmail.com",
+            "username": "musyoka",
+            "password": "mbuvi1",
+            "confirm password": "mbuviq1"
+        }
+        response = self.app.put('/api/v1/auth/reset_password',
+                                data=json.dumps(user_data),
+                                content_type='application/json')
+        # self.assertEqual(response.status_code, 400)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response_data['message'], 'Passwords do not match')
+
+    def test_user_can_logout(self):
+        """Register a new user, log him in, and then try to log him out."""
+
+        # Register user
+        self.app.post('/api/v1/auth/signup', data=json.dumps(self.user_data), 
+                                             content_type='application/json')
+        # login
+        response = self.app.post('/api/v1/auth/login', data=json.dumps(self.valid_user),
+                                                       content_type='application/json')
+        received_data = json.loads(response.get_data().decode('utf-8'))
+        token = received_data['token']
+        # logout
+        response = self.app.post('/api/v1/auth/logout', headers={'content_type': 'application/json',
+                                                                 'Authorization': 'Bearer {}'.format(token)})
+        received_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(received_data['message'], "Successfully logged out")
+
+
+    def test_can_get_documentation(self):
+        response = self.app.get('/api/v1/docs')
+        self.assertEqual(response.status_code, 200)
 
 
 if __name__ == '__main__':

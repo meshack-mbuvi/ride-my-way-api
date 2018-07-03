@@ -10,6 +10,7 @@ class Config(object):
     JWT_SECRET_KEY = 'You and me knows very well it is secret'
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+    
 
 
 class ProductionConfig(Config):
@@ -24,11 +25,19 @@ class StagingConfig(Config):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
+    os.environ["DATABASE_NAME"] = "ridemyway"
+    os.environ["USER"] = "ridemyway"
+    os.environ["PASSWORD"] = "ridemyway"
+    os.environ["HOST"] = "localhost"
 
 
 class TestingConfig(Config):
     TESTING = True
     DEBUG = True
+    os.environ["DATABASE_NAME"] = "test"
+    os.environ["USER"] = "ridemyway"
+    os.environ["PASSWORD"] = "ridemyway"
+    os.environ["HOST"] = "localhost"
 
 
 configuration = {
