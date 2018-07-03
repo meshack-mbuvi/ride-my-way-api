@@ -11,7 +11,7 @@ db = database
 
 
 def create_app(config, database=None):
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True, static_folder=None)
     app.config.from_object(configuration[config])
     app.url_map.strict_slashes = False
 
@@ -37,9 +37,10 @@ def create_app(config, database=None):
 
     from application.views.ride_views import api as rides
     from application.views.user_views import api as user
-    # Blueprints to be registered here
     api.add_namespace(rides, path='/api/v1')
     api.add_namespace(user, path='/api/v1')
+    from application.docs.views import docs
+    app.register_blueprint(docs)
 
     # create tables
     create_all()
