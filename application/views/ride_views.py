@@ -78,6 +78,13 @@ class Rides(Resource):
             if past_date(data['start time']):
                 return {'message': 'Cannot create an expired ride'}, 403
 
+            query = "SELECT driver from users where username='{}'"\
+                .format(current_user)
+            cursor.execute(query)
+            row = cursor.fetchone()
+            if row[0] is False:
+                return "Only a driver can create a ride offer.", 401
+
             try:
                 # set id for the ride offer
 
@@ -227,9 +234,9 @@ class Requests(Resource):
             user_id = row[0]
 
             query = "SELECT username,phone,start_point,destination,\
-            start_time,status from requests INNER JOIN rides \
-                    ON requests.ride_id = '{}' INNER JOIN \
-                    users on users.user_id = requests.user_id" \
+            start_time,status from users INNER JOIN requests \
+                    ON requests.user_id = users.user_id INNER JOIN \
+                    rides on rides.ride_id = '{}'" \
                     . format(ride_id)
             cursor.execute(query)
             rows = cursor.fetchall()
@@ -257,16 +264,21 @@ class RequestActions(Resource):
         try:
             data = request.get_json()
             act = True
+            response = ''
             if data['action'].lower() == 'accept':
                 act = True
+                response = {'message': 'Request accept'}
             else:
                 act = False
+                response = {'message': 'Request rejected'}
             query = "UPDATE requests SET status = '{}'\
              where requests.req_id = '{}' and requests.ride_id = '{}'" \
              . format(act, int(requestId), int(rideId))
             cursor.execute(query)
+            return response
 
         except Exception as e:
+            print(e)
             return {'message': 'Request not successful.'}, 500
 
 
