@@ -15,11 +15,19 @@ class Config(object):
 
 class ProductionConfig(Config):
     DEBUG = False
+    os.environ["DATABASE_NAME"] = "du15ldvvdve7g"
+    os.environ["USER"] = "fykazngytmidee"
+    os.environ["PASSWORD"] = "7a940a85b94644e69d871928b9dc8a7b1dda264fcfb4724ca6c0f423514b230b"
+    os.environ["HOST"] = "ec2-54-225-230-142.compute-1.amazonaws.com"
 
 
 class StagingConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
+    os.environ["DATABASE_NAME"] = "ridemyway"
+    os.environ["USER"] = "ridemyway"
+    os.environ["PASSWORD"] = "ridemyway"
+    os.environ["HOST"] = "localhost"
 
 
 class DevelopmentConfig(Config):
