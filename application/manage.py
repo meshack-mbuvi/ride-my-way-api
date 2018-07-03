@@ -74,10 +74,6 @@ class Database(object):
         cursor.execute(query)
         return cursor
 
-    def __del__(self):
-        # close connectin to the database
-        self.connection.close()
-
 
 if __name__ == '__main__':
     dbObject = Database()
