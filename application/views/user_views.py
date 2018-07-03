@@ -1,11 +1,14 @@
 from validate_email import validate_email
-from psycopg2 import connect
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import jwt_required, get_raw_jwt, create_access_token
 from werkzeug.security import generate_password_hash
+from flask_restplus import Resource, Namespace, fields
+from flask import request, jsonify
+from datetime import datetime
 
-from . import *
-from application.models.user_model import User, dbname, user, host, password
+from application.models.user_model import User
+from application import db
+from . import blacklist
 
 api = Namespace('Users', Description='User operations')
 
@@ -17,11 +20,6 @@ usermodel = api.model('sign up', {
     'confirm password': fields.String(description='confirm password'),
     'driver': fields.Boolean(description='true if driver, false otherwise')
 })
-
-
-connection = connect(database=dbname, user=user, host=host, password=password)
-connection.autocommit = True
-cursor = connection.cursor()
 
 
 class UserSignUp(Resource):
@@ -52,19 +50,18 @@ class UserSignUp(Resource):
         if not password == confirmPassword:
             return {'message': 'Passwords do not match'}, 400
 
-        user = None
         try:
             query = "select username from users where username='%s'\
              or email='%s' or phone='%s'" % (username, email, phone)
-            cursor.execute(query)
-            user = cursor.fetchone()
+            result = db.execute(query)
+            user = result.fetchone()
             if user is None:
-                data = request.get_json()
                 userObject = User(userData)
                 userObject.save()
                 return {'message': 'Account created.'}, 201
             return {'message': 'User exists.'}, 409
         except Exception as e:
+            print(e)
             return {'message': 'Request not successful'}, 500
 
 # model for login
@@ -101,8 +98,8 @@ class UserLogin(Resource):
             else:
                 query = "select password from users where username='{}'"\
                     . format(username)
-            cursor.execute(query)
-            user = cursor.fetchone()
+            result = db.execute(query)
+            user = result.fetchone()
 
             if user is None:
                 return {'message': 'User not found.'}, 404
@@ -113,6 +110,7 @@ class UserLogin(Resource):
             else:
                 return {'message': 'Invalid password.'}, 401
         except Exception as e:
+            print(e)
             return {'message': 'Request not successful'}, 500
 
 
@@ -133,9 +131,9 @@ class ResetPassword(Resource):
             return {"message": "Please ensure all fields are non-empty."}, 400
 
         if len(password) < 6:
-            return {'message': 'password should be 6 characters or more.'}, 400
+            return {'message': 'passwords should be 6 characters or more.'}, 400
 
-        if not validate_email(email):
+        if not (validate_email(email)):
             return {"message": "Email is invalid"}, 400
 
         if not password == confirmPassword:
@@ -145,22 +143,34 @@ class ResetPassword(Resource):
         try:
             query = "SELECT *  from users where username='{}' and email='{}'"\
                 . format(username, email)
-            cursor.execute(query)
-            row = cursor.fetchone()
+            result = db.execute(query)
+            row = result.fetchone()
             if row is not None:
                 query = "UPDATE users SET password = '{}' \
                     where username='{}' and email='{}'"\
                     . format(generate_password_hash(password,
                                                     method='sha256'),
                              username, email)
-                cursor.execute(query)
+                db.execute(query)
                 return {'message': 'password updated'}
             else:
                 return {'message': 'user not found'}, 404
-        except Exception as e:
-            print(e)
+        except Exception as e: return {'message': 'Request not successful'}, 500
+
+class Logout(Resource):
+    """handles user logout."""
+    @jwt_required
+    def post(self):
+        """Log out a given user by blacklisting user's token
+        :return
+            message and status code.
+        """
+        jti = get_raw_jwt()['jti']
+        blacklist.add(jti)
+        return ({'message': "Successfully logged out"}), 200
 
 
 api.add_resource(UserSignUp, '/auth/signup')
 api.add_resource(UserLogin, '/auth/login')
+api.add_resource(Logout, '/auth/logout')
 api.add_resource(ResetPassword, '/auth/reset_password')

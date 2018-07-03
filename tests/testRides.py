@@ -1,9 +1,7 @@
 import json
 import unittest
-from psycopg2 import connect
 
-from application import create_app, database
-from application.models import dbname, user, host, password
+from application import create_app, db
 
 
 class RidesOfferTests(unittest.TestCase):
@@ -13,7 +11,7 @@ class RidesOfferTests(unittest.TestCase):
 
         self.app = create_app('testing')
         self.app = self.app.test_client()
-        self.db = database()
+        self.db = db
         self.db.create_all()
 
         # create user
@@ -233,6 +231,26 @@ class RidesOfferTests(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response_data['message'],
                          "Your request has been send.")
+
+    def test_user_cannot_request_a_ride_twice(self):
+        """test user cannot request to join a ride twice."""
+        # create a ride to be sure a ride exists.
+        self.app.post('/api/v1/users/rides',
+                      data=json.dumps(self.ride),
+                      content_type='application/json',
+                      headers=self.headers)
+
+        # show interest to join the ride offer twice
+        self.app.post('/api/v1/rides/1/requests',
+                                 content_type='application/json',
+                                 headers=self.headers_for_passenger)
+        response = self.app.post('/api/v1/rides/1/requests',
+                                 content_type='application/json',
+                                 headers=self.headers_for_passenger)
+        response_data = json.loads(response.get_data().decode('utf-8'))
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response_data['message'],
+                         "You already requested this ride.")
 
     def test_user_cannot_request_a_non_existing_ride(self):
         """test user cannot request a non existing ride offer."""
