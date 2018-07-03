@@ -202,16 +202,6 @@ class LoginTests(unittest.TestCase):
         self.assertEqual(response_data['message'],
                          'Invalid password.')
 
-    def test_user_cannot_login_with_password_with_less_than_6_characters(self):
-        """test user cannot login with password having less than 6 characters"""
-        response = self.app.post('/api/v1/auth/login',
-                                 data=json.dumps(self.invalid_password),
-                                 content_type='application/json')
-        response_data = json.loads(response.get_data().decode('utf-8'))
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(response_data['message'],
-                         'Invalid password.')
-
     def test_non_existing_user_cannot_login(self):
         """test non-existing user cannot login"""
         response = self.app.post('/api/v1/auth/login',
@@ -278,7 +268,7 @@ class LoginTests(unittest.TestCase):
         self.assertEqual(response_data['message'], 'Email is invalid')
 
     def test_user_passwords_match(self):
-        """test that users email when changing password is valid"""
+        """test that users passwords are matching when updating user details"""
         user_data = {
             "email": "meshmbuvi@gmail.com",
             "username": "musyoka",

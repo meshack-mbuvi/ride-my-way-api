@@ -36,7 +36,6 @@ class RidesOfferTests(unittest.TestCase):
                                  data=json.dumps(user_login_data),
                                  content_type='application/json')
         response_data = json.loads(response.get_data().decode('utf-8'))
-        print(response_data)
 
         token = response_data['token']
         # add the token to the authorization header
@@ -206,7 +205,6 @@ class RidesOfferTests(unittest.TestCase):
                                 headers=self.headers)
         # self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.get_data().decode('utf-8'))
-        print(response_data)
         self.assertEqual(response_data[0]['id'], 1)
 
     def test_get_ride_that_does_not_exist(self):
@@ -231,7 +229,7 @@ class RidesOfferTests(unittest.TestCase):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response_data['message'],
-                         "Your request has been send.")
+                         "Your request has been sent.")
 
     def test_user_cannot_request_a_ride_twice(self):
         """test user cannot request to join a ride twice."""
@@ -264,23 +262,21 @@ class RidesOfferTests(unittest.TestCase):
                          "That ride does not exist")
 
     def test_user_can_view_user_requests_to_join_a_ride(self):
-        """Test users can view users requests to join a ride offer."""
-        # Create an offer
+        """Test users can view users requests to join a ride offer.
+        creates a new ride, sends request to join the ride offer.
+        Using login details for driver, view all requests."""
         self.app.post('/api/v1/users/rides',
                       data=json.dumps(self.ride),
                       content_type='application/json',
                       headers=self.headers)
-        # request to join the ride
         self.app.post('/api/v1/rides/1/requests',
                       content_type='application/json',
                       headers=self.headers_for_passenger)
-        # view user requests
         response = self.app.get('/api/v1/users/rides/1/requests',
                                 content_type='application/json',
                                 headers=self.headers)
-        # self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.get_data().decode('utf-8'))
-        print(response_data)
         self.assertTrue(len(response_data) > 0)
 
     def test_user_cannot_view_user_requests_for_no_existing_offer(self):
@@ -290,7 +286,6 @@ class RidesOfferTests(unittest.TestCase):
                                 headers=self.headers)
         self.assertEqual(response.status_code, 404)
         response_data = json.loads(response.get_data().decode('utf-8'))
-        print(response)
         self.assertNotIn('requests', response_data)
 
     def test_driver_can_accept_user_request(self):
@@ -299,12 +294,10 @@ class RidesOfferTests(unittest.TestCase):
                       data=json.dumps(self.ride),
                       content_type='application/json',
                       headers=self.headers)
-        # passenger requests to join offer
         self.app.post('/api/v1/rides/1/requests',
                       content_type='application/json',
                       headers=self.headers_for_passenger)
         data = {"action": "accept"}
-        # driver accepts ride offer
         response = self.app.put('/api/v1/users/rides/1/requests/1',
                                 data=json.dumps(data),
                                 content_type='application/json',

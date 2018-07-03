@@ -2,12 +2,14 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restplus import Resource, Namespace, fields
 from flask import request, jsonify
 from datetime import datetime
-
+from . import *
 from application.models.ride_models import RideOffer
 from application import db
+from flask_jwt_extended import JWTManager
+
+jwt= JWTManager()
 
 api = Namespace('Ride offers', Description='Operations on Rides')
-
 
 ride = api.model('Ride offer', {
     'start point': fields.String(description='location of the driver'),
@@ -77,7 +79,6 @@ class Rides(Resource):
                 # set id for the ride offer
 
                 start_time = convert_date(data['start time'])
-                print(type(start_time), start_time)
                 if type(start_time) == type(str("")):
                     query = "SELECT * from rides where start_point='{}'\
                      and destination = '{}' and start_time='{}' \
@@ -97,7 +98,7 @@ class Rides(Resource):
                                 'ride offer added successfully.'}, 201
                     return {'message': 'offer exists.'}, 409
 
-                # return the error caught on datetime conversion since it is saved on variable start_time
+                # returns the error caught on datetime conversion since it is saved on variable start_time
                 return start_time
                 
             except Exception as e:
@@ -203,7 +204,7 @@ class JoinRide(Resource):
                                  . format(datetime.now(), ride_id,
                                           user_id, False)
                     db.execute(query)
-                    return {'message': 'Your request has been send.'}, 201
+                    return {'message': 'Your request has been sent.'}, 201
 
                     # update the available space to reflect this new request
                     query = "UPDATE rides set 'available space'='{}'" .format((row[6] - 1))
@@ -273,6 +274,8 @@ class RequestActions(Resource):
                         .format((rideId))
             result = db.execute(query)
             seats = result.fetchone()
+            if seats is None:
+                return {'message': 'No ride offer with given ride id'}, 404
             available_seats = seats[0]
 
             # check for action to take
@@ -290,9 +293,7 @@ class RequestActions(Resource):
                 if status[0]:
                     available_seats += 1
                 else:
-                    return {'message': 'Request is rejected'}
-                    
-                response = {'message': 'Request rejected'}
+                    return {'message': 'Request is already rejected'}
 
             query = "UPDATE requests SET status = '{}'\
              where requests.req_id = '{}'" \
@@ -305,7 +306,9 @@ class RequestActions(Resource):
 
             return response
 
-        except Exception as e: return e, 500
+        except Exception as e:
+            print(e)
+            return {'Error': e}, 500
 
 
 api.add_resource(Rides, '/users/rides')
