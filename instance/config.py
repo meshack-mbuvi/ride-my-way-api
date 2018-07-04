@@ -22,7 +22,7 @@ class ProductionConfig(Config):
     os.environ["DATABASE_NAME"] = "du15ldvvdve7g"
     os.environ["USER"] = "fykazngytmidee"
     os.environ["PASSWORD"] = "7a940a85b94644e69d871928b9dc8a7b1dda264fcfb4724ca6c0f423514b230b"
-    os.environ["HOST"] = "localhost:{}".format(int(os.environ.get("PORT", 500)))
+    os.environ["HOST"] = "127.0.0.1:{}".format(int(os.environ.get("PORT", 500)))
 
 
 class StagingConfig(Config):
