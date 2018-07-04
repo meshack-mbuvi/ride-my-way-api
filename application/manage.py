@@ -1,17 +1,14 @@
 import os
 from psycopg2 import connect
+from flask import current_app
 
 class Database(object):
 
     def __init__(self):
-        self.dbname = os.getenv("DATABASE_NAME")
-        self.user = os.getenv("USER")
-        self.password = os.getenv("PASSWORD")
-        self.host = os.getenv("HOST")
-        print(self.dbname)
+        self.DATABASE_URI = os.getenv('DATABASE_URI')
+        print(self.DATABASE_URI)
         print("...connecting")
-        connection = connect(dbname=self.dbname,
-                             user=self.user, host=self.host, password=self.password)
+        connection = connect(self.DATABASE_URI)
         connection.autocommit = True
         self.connection = connection
 

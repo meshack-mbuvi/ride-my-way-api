@@ -38,6 +38,4 @@ def create_app(config, database=None):
     from application.docs.views import docs
     app.register_blueprint(docs)
 
-    # create all tables
-    db.create_all()
     return app

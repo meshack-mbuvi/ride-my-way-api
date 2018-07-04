@@ -1,12 +1,4 @@
 import os
-from os.path import join, dirname
-from dotenv import load_dotenv
-basedir = os.path.abspath(os.path.dirname(__file__))
-
-dotenv_path = join(dirname(__file__), '.env')
-
-# load file from the path
-load_dotenv(dotenv_path)
 
 
 class Config(object):
@@ -37,12 +29,7 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
 
-    DATABASE_URI = os.getenv('DATABASE_URI')
-    DATABASE_NAME = os.getenv('DATABASE_NAME')
-    PASSWORD = os.getenv('PASSWORD')
-    HOST = os.getenv('HOST')
-    USER = os.getenv('USER')
-
+    DATABASE_URI = "postgres://fykazngytmidee:7a940a85b94644e69d871928b9dc8a7b1dda264fcfb4724ca6c0f423514b230b@ec2-54-225-230-142.compute-1.amazonaws.com:5432/du15ldvvdve7g"
 
 
 class TestingConfig(Config):
