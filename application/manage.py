@@ -8,7 +8,7 @@ class Database(object):
         self.dbname = "du15ldvvdve7g"
         self.user = "fykazngytmidee"
         self.password = "7a940a85b94644e69d871928b9dc8a7b1dda264fcfb4724ca6c0f423514b230b"
-        self.host = "ec2-54-225-230-142.compute-1.amazonaws.com:5432"
+        self.host = "ec2-54-225-230-142.compute-1.amazonaws.com"
         print(self.dbname)
         print("...connecting")
         connection = connect(dbname=self.dbname,
