@@ -10,7 +10,7 @@ class Database(object):
         self.host = os.getenv("HOST")
         print(self.host)
         print("...connecting")
-        connection = connect(database=self.dbname,
+        connection = connect(dbname=self.dbname,
                              user=self.user, host=self.host, password=self.password)
         connection.autocommit = True
         self.connection = connection
