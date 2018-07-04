@@ -37,5 +37,6 @@ def create_app(config, database=None):
     api.add_namespace(user, path='/api/v1')
     from application.docs.views import docs
     app.register_blueprint(docs)
+    db.create_all()
 
     return app
