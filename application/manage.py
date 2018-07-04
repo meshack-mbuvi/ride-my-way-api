@@ -1,33 +1,31 @@
+import os
 from psycopg2 import connect
+from flask import current_app
 
-dbname = 'ridemyway'
-user = 'ridemyway'
-host = 'localhost'
-password = 'ridemyway'
+class Database(object):
 
-
-class database():
-
-    def connect(self, dbname):
-        dbname = dbname
-        connection = connect(database=dbname,
-                             user=user, host=host, password=password)
+    def __init__(self):
+        self.dbname = "du15ldvvdve7g"
+        self.user = "fykazngytmidee"
+        self.password = "7a940a85b94644e69d871928b9dc8a7b1dda264fcfb4724ca6c0f423514b230b"
+        self.host = "ec2-54-225-230-142.compute-1.amazonaws.com"
+        print(self.dbname)
+        print("...connecting")
+        connection = connect(dbname=self.dbname,
+                             user=self.user, host=self.host, password=self.password)
         connection.autocommit = True
-        return connection
+        self.connection = connection
 
-    def create_all(self, dbname=dbname):
-        # Create all tables here
-        connection = self.connect(dbname)
+    def create_all(self):
+        print("... starting creation of relations")
         commands = (
-            'DROP TABLE "users" CASCADE',
-            'CREATE TABLE users (user_id serial PRIMARY KEY, \
+            'CREATE TABLE IF NOT EXISTS users (user_id serial PRIMARY KEY, \
                         username varchar(255), \
                         email varchar(50) NOT NULL, \
                         password varchar(255) NOT NULL, \
                         phone varchar(255) NOT NULL, driver boolean )',
 
-            'DROP TABLE "rides" CASCADE',
-            'CREATE TABLE rides (ride_id serial PRIMARY KEY, \
+            'CREATE TABLE IF NOT EXISTS rides (ride_id serial PRIMARY KEY, \
                        owner_id serial, \
                        start_point varchar(255), \
                        destination varchar(255), \
@@ -35,8 +33,7 @@ class database():
                        route varchar(255) NOT NULL, \
                        available_space Int NOT NULL, \
                        FOREIGN KEY (owner_id) REFERENCES users(user_id) )',
-            'DROP TABLE "requests" CASCADE',
-            'CREATE TABLE requests (req_id serial PRIMARY KEY,\
+            'CREATE TABLE IF NOT EXISTS requests (req_id serial PRIMARY KEY,\
                        date_created timestamp,\
                        ride_id serial,\
                        user_id serial,\
@@ -46,46 +43,40 @@ class database():
         )
 
         try:
-            cursor = connection.cursor()
+            cursor = self.connection.cursor()
             # create table one by one
             print("Creating relations")
             for command in commands:
                 cursor.execute(command)
             # close communication with the PostgreSQL database server
             cursor.close()
-            # commit the changes
-            connection.commit()
             print("Done.")
         except (Exception) as error:
             print(error)
-        finally:
-            if connection is not None:
-                connection.close()
 
-    def drop_all(self, dbname=dbname):
-        connection = self.connect(dbname)
+    def drop_all(self):
         commands = (
             'DROP TABLE "users" CASCADE',
             'DROP TABLE "rides" CASCADE',
             'DROP TABLE "requests" CASCADE')
         try:
-            connection.autocommit = True
-            cursor = connection.cursor()
-            # create table one by one
+            cursor = self.connection.cursor()
+            # drop table one by one
             print("Deleting relations")
             for command in commands:
                 cursor.execute(command)
             # close communication with the PostgreSQL database server
             cursor.close()
-            # commit the changes
-            connection.commit()
             print("Done.")
         except (Exception) as error:
             print(error)
-        finally:
-            if connection is not None:
-                connection.close()
+
+    def execute(self, query):
+        cursor = self.connection.cursor()
+        cursor.execute(query)
+        return cursor
+
 
 if __name__ == '__main__':
-    dbObject = database()
+    dbObject = Database()
     dbObject.create_all()

@@ -3,13 +3,9 @@ from flask_restplus import Api
 from flask_jwt_extended import JWTManager
 
 from instance.config import configuration
-from application.manage import database
+from application.manage import Database
 
-from application.models import create_all
-
-db = database
-
-
+db = Database()
 def create_app(config, database=None):
     app = Flask(__name__, instance_relative_config=True, static_folder=None)
     app.config.from_object(configuration[config])
@@ -41,7 +37,6 @@ def create_app(config, database=None):
     api.add_namespace(user, path='/api/v1')
     from application.docs.views import docs
     app.register_blueprint(docs)
+    db.create_all()
 
-    # create tables
-    create_all()
     return app

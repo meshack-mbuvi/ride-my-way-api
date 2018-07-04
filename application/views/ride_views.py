@@ -1,17 +1,10 @@
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from psycopg2 import connect
-from application.models.ride_models import RideOffer
+from flask_restplus import Resource, Namespace, fields
+from flask import request, jsonify
 from datetime import datetime
 
-from . import *
-dbname = 'ridemyway'
-user = 'ridemyway'
-host = 'localhost'
-password = 'ridemyway'
-
-connection = connect(database=dbname, user=user, host=host, password=password)
-connection.autocommit = True
-cursor = connection.cursor()
+from application.models.ride_models import RideOffer
+from application import db
 
 api = Namespace('Ride offers', Description='Operations on Rides')
 
@@ -27,7 +20,6 @@ ride = api.model('Ride offer', {
     'available space': fields.Integer(
         description='available space for passengers')
 })
-
 
 def past_date(date_string):
     """checks whether date given is a past date
@@ -80,8 +72,8 @@ class Rides(Resource):
 
             query = "SELECT driver from users where username='{}'"\
                 .format(current_user)
-            cursor.execute(query)
-            row = cursor.fetchone()
+            result = db.execute(query)
+            row = result.fetchone()
             if row[0] is False:
                 return "Only a driver can create a ride offer.", 401
 
@@ -97,8 +89,8 @@ class Rides(Resource):
                                                     data['destination'],
                                                     start_time, current_user)
 
-                    cursor.execute(query)
-                    row = cursor.fetchone()
+                    result = db.execute(query)
+                    row = result.fetchone()
                     if row is None:
                         data['start time'] = start_time
                         ride_offer = RideOffer(data)
@@ -126,8 +118,8 @@ class AllRides(Resource):
         """Retrieves all available rides"""
         try:
             query = "SELECT * from rides"
-            cursor.execute(query)
-            rows = cursor.fetchall()
+            result = db.execute(query)
+            rows = result.fetchall()
             return jsonify([
                 {'id': row[0], 'start point': row[2],
                  'destination': row[3], 'start_time': row[4], 'route': row[5],
@@ -148,8 +140,8 @@ class SingleRide(Resource):
         try:
             query = "SELECT * from rides where ride_id = {}"\
                 . format(ride_id)
-            cursor.execute(query)
-            rows = cursor.fetchall()
+            result = db.execute(query)
+            rows = result.fetchall()
 
             if len(rows) > 0:
                 return jsonify([
@@ -160,7 +152,7 @@ class SingleRide(Resource):
                     for row in rows])
             return {'message': 'Offer not found'}, 404
         except Exception as e:
-            {'message': 'Request not successful.'}, 500
+            return {'message': 'Request not successful.'}, 500
 
 
 class JoinRide(Resource):
@@ -178,35 +170,44 @@ class JoinRide(Resource):
             query = "SELECT users.user_id \
                             from users where username='{}'"\
                             . format(current_user)
-            cursor.execute(query)
-            user_row = cursor.fetchone()
+            result = db.execute(query)
+            user_row = result.fetchone()
             user_id = user_row[0]
-            # check whether ride offer is expired
+            # Find the particular ride offer to check its availability
             query = "SELECT * from rides where ride_id = '{}'" . format(
                 ride_id)
-            cursor.execute(query)
-            row = cursor.fetchone()
+            result = db.execute(query)
+            row = result.fetchone()
             if row is None:
                 return {'message': 'That ride does not exist'}, 404
             time = (row[4])
+            # check whether this ride offer belongs to the user
             if user_id == row[1]:
                 return {'message':
                         'You cannot request to join your own offer'}, 403
+            # # check whether ride offer has any remaining space
+            if row[6] < 1:
+                return {'message': 'Ride offer has no available space'}, 404
+
+            # check whether ride offer is expired 
             if time > datetime.now():
                 # check whether users has alread requested given ride offer
                 query = "SELECT * from requests where user_id = (SELECT users.user_id \
                             from users where username='{}') and ride_id = {}"\
                     . format(current_user, ride_id)
-                cursor.execute(query)
-                result = cursor.fetchone()
+                result = db.execute(query)
+                result = result.fetchone()
                 if result is None:
                     # save user requests now
                     query = "INSERT INTO requests (date_created, ride_id, user_id, status)\
                                 values('{}', '{}', '{}', '{}')"\
                                  . format(datetime.now(), ride_id,
                                           user_id, False)
-                    cursor.execute(query)
+                    db.execute(query)
                     return {'message': 'Your request has been send.'}, 201
+
+                    # update the available space to reflect this new request
+                    query = "UPDATE rides set 'available space'='{}'" .format((row[6] - 1))
                 # user has already requested to join this ride offer
                 return{'message': 'You already requested this ride.'}, 403
             else:
@@ -229,17 +230,17 @@ class Requests(Resource):
             query = "SELECT user_id from users where username='{}'"\
                 .format(get_jwt_identity()
                         )
-            cursor.execute(query)
-            row = cursor.fetchone()
-            user_id = row[0]
+            result = db.execute(query)
+            row = result.fetchone()
+            owner_id = row[0]
 
             query = "SELECT username,phone,start_point,destination,\
             start_time,status from users INNER JOIN requests \
                     ON requests.user_id = users.user_id INNER JOIN \
-                    rides on rides.ride_id = '{}'" \
-                    . format(ride_id)
-            cursor.execute(query)
-            rows = cursor.fetchall()
+                    rides on rides.ride_id = '{}' and rides.owner_id = '{}'" \
+                    . format(ride_id, owner_id)
+            result = db.execute(query)
+            rows = result.fetchall()
             if len(rows) > 0:
                 return jsonify([{'name of user': row[0], 'user phone': row[1],
                                  'pick up point': row[2],
@@ -248,8 +249,7 @@ class Requests(Resource):
                                  'status': 'Accepted' if row[5] is True
                                  else 'Pending'} for row in rows])
             return {'message': 'Ride does not exist'}, 404
-        except Exception as e:
-            return {'message': 'Request not successful.'}, 500
+        except Exception as e:  return e, 500
 
 
 class RequestActions(Resource):
@@ -263,23 +263,21 @@ class RequestActions(Resource):
         """Driver can accept or reject the ride offer."""
         try:
             data = request.get_json()
-            act = True
+            action = True
             response = ''
             if data['action'].lower() == 'accept':
                 act = True
                 response = {'message': 'Request accept'}
             else:
-                act = False
+                action = False
                 response = {'message': 'Request rejected'}
             query = "UPDATE requests SET status = '{}'\
              where requests.req_id = '{}' and requests.ride_id = '{}'" \
-             . format(act, int(requestId), int(rideId))
-            cursor.execute(query)
+             . format(action, int(requestId), int(rideId))
+            db.execute(query)
             return response
 
-        except Exception as e:
-            print(e)
-            return {'message': 'Request not successful.'}, 500
+        except Exception as e: return e, 500
 
 
 api.add_resource(Rides, '/users/rides')

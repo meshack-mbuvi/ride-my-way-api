@@ -1,8 +1,8 @@
 from datetime import datetime
-from . import *
+from . import db
 
 
-class RideOffer(object):
+class RideOffer():
     """Model of a ride offer
     start point: String location of the driver,
     destination: String end-point of the journey,
@@ -30,9 +30,5 @@ class RideOffer(object):
                                                         self.start_time,
                                                         self.route,
                                                         self.available_space)
-        cursor.execute(query)
-        connection.commit()
-
-
-    def fetch_all(self):
-        pass
+        db.execute(query)
+        
