@@ -21,7 +21,7 @@ class ProductionConfig(Config):
     DEBUG = False
     os.environ["DATABASE_NAME"] = "du15ldvvdve7g"
     os.environ["PASSWORD"] = "7a940a85b94644e69d871928b9dc8a7b1dda264fcfb4724ca6c0f423514b230b"
-    os.environ["HOST"] = "ec2-54-225-230-142.compute-1.amazonaws.com:5432"
+    os.environ["HOST"] = "ec2-54-225-230-142.compute-1.amazonaws.com"
     os.environ["USER"] = "fykazngytmidee"
 
 class StagingConfig(Config):
@@ -31,7 +31,7 @@ class StagingConfig(Config):
 
     os.environ["USER"] = "fykazngytmidee"
     os.environ["PASSWORD"] = "7a940a85b94644e69d871928b9dc8a7b1dda264fcfb4724ca6c0f423514b230b"
-    os.environ["HOST"] = "ec2-54-225-230-142.compute-1.amazonaws.com:5432"
+    os.environ["HOST"] = "ec2-54-225-230-142.compute-1.amazonaws.com"
 
 
 class DevelopmentConfig(Config):
