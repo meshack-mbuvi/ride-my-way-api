@@ -4,7 +4,7 @@ from application import create_app
 
 
 if __name__ == '__main__':
-    app = create_app('production')
+    app = create_app('development')
     app.wsgi_app = ProxyFix(app.wsgi_app)
     port = int(os.environ.get("PORT", 5432))
     app.run(debug=True)
