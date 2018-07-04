@@ -8,6 +8,7 @@ class Database(object):
         self.user = os.getenv("USER")
         self.password = os.getenv("PASSWORD")
         self.host = os.getenv("HOST")
+        print(self.host)
         print("...connecting")
         connection = connect(database=self.dbname,
                              user=self.user, host=self.host, password=self.password)
