@@ -36,6 +36,7 @@ class RidesOfferTests(unittest.TestCase):
                                  data=json.dumps(user_login_data),
                                  content_type='application/json')
         response_data = json.loads(response.get_data().decode('utf-8'))
+        print(response_data)
 
         token = response_data['token']
         # add the token to the authorization header

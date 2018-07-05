@@ -2,7 +2,7 @@ from flask import Flask, Blueprint
 from flask_restplus import Api
 from flask_jwt_extended import JWTManager
 
-from instance.config import configuration
+from application.config import configuration
 from application.manage import Database
 
 db = Database()
