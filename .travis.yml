@@ -12,7 +12,7 @@ services:
 
 before_script:
   - psql -c "CREATE ROLE ridemyway WITH SUPERUSER LOGIN PASSWORD 'ridemyway';" -U postgres
-  - psql -c "CREATE DATABASE ridemyway;" -U postgres
+  - psql -c "CREATE DATABASE test;" -U postgres
 
 script: 
   - nosetests --with-coverage

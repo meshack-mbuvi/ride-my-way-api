@@ -1,7 +1,7 @@
 from validate_email import validate_email
 from werkzeug.security import generate_password_hash
 
-from . import *
+from . import db
 
 
 class User():
@@ -19,6 +19,5 @@ class User():
         query = "INSERT INTO users (username,email,password,phone,driver)\
         VALUES ('" + self.username + "', '" + self.email + "', '" + self.password + "', \
              {},{})". format(self.phone, self.driver)
-        cursor.execute(query)
-        connection.commit()
-        return
+
+        return db.execute(query)
