@@ -1,6 +1,6 @@
 from validate_email import validate_email
 from werkzeug.security import check_password_hash
-from flask_jwt_extended import jwt_required, get_raw_jwt, create_access_token
+from flask_jwt_extended import jwt_required, get_raw_jwt, create_access_token, get_jwt_identity
 from werkzeug.security import generate_password_hash
 from flask_restplus import Resource, Namespace, fields
 from flask import request, jsonify
@@ -169,8 +169,24 @@ class Logout(Resource):
         blacklist.add(jti)
         return ({'message': "Successfully logged out"}), 200
 
+class Profile(Resource):
+    @jwt_required
+    def get(self):
+        username = get_jwt_identity()
+        query = "select email, phone, driver from users\
+                   where username='{}'".format(username)
+        result = db.execute(query)
+        users = result.fetchone()
+        user_type = 'Passenger'
+        if users[2] is True:
+            user_type = 'Driver'
+        
+        return {'username': username, 'phone': users[1], 'email':users[0]}, 200
+
+
 
 api.add_resource(UserSignUp, '/auth/signup')
 api.add_resource(UserLogin, '/auth/login')
 api.add_resource(Logout, '/auth/logout')
+api.add_resource(Profile, '/auth/profile')
 api.add_resource(ResetPassword, '/auth/reset_password')
