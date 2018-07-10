@@ -20,6 +20,7 @@ class ProductionConfig(Config):
     PASSWORD = os.getenv('PASSWORD')
     HOST = os.getenv('HOST')
     USER = os.getenv('USER')
+    DATABASE_URL = os.getenv('DATABASE_URL')
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
@@ -35,5 +36,5 @@ class TestingConfig(Config):
 configuration = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
-    'production': DevelopmentConfig
+    'production': ProductionConfig
 }
