@@ -1,5 +1,5 @@
 from datetime import datetime
-from . import db
+from application import db
 
 
 class RideOffer():

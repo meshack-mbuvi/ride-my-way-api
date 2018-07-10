@@ -1,10 +1,11 @@
-from validate_email import validate_email
+# from validate_email import validate_email
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import jwt_required, get_raw_jwt, create_access_token, get_jwt_identity
 from werkzeug.security import generate_password_hash
 from flask_restplus import Resource, Namespace, fields
 from flask import request, jsonify
 from datetime import datetime
+import re
 
 from application.models.user_model import User
 from application import db
@@ -21,6 +22,11 @@ usermodel = api.model('sign up', {
     'driver': fields.Boolean(description='true if driver, false otherwise')
 })
 
+def validate_email(email):
+    match = re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9]+\.[a-zA-Z0-9.]*\.*[com|org|edu]{3}$)",email)
+    if match is not None:
+        return True
+    return False
 
 class UserSignUp(Resource):
 
@@ -31,6 +37,8 @@ class UserSignUp(Resource):
     def post(self):
         """User sign up"""
         userData = request.get_json()
+        firstname = userData['firstname']
+        secondname = userData['secondname']
         username = userData['username']
         confirmPassword = userData['confirm password']
         phone = userData['phone']
@@ -38,7 +46,8 @@ class UserSignUp(Resource):
         password = userData["password"]
 
         if username.strip() == "" or email == "" or phone.strip() == ""\
-                or confirmPassword.strip() == "" or password.strip() == "":
+                or confirmPassword.strip() == "" or password.strip() == ""\
+                or firstname.strip() == "" or secondname.strip() == "":
             return {"message": "Please ensure all fields are non-empty."}, 400
 
         if len(password) < 6:
@@ -55,7 +64,9 @@ class UserSignUp(Resource):
              or email='%s' or phone='%s'" % (username, email, phone)
             result = db.execute(query)
             user = result.fetchone()
+            print(user)
             if user is None:
+                print(user)
                 userObject = User(userData)
                 userObject.save()
                 return {'message': 'Account created.'}, 201
@@ -181,7 +192,8 @@ class Profile(Resource):
         if users[2] is True:
             user_type = 'Driver'
         
-        return {'username': username, 'phone': users[1], 'email':users[0]}, 200
+        return {'username': username, 'email':users[0], \
+        'phone': users[1], 'user type': user_type}, 200
 
 
 

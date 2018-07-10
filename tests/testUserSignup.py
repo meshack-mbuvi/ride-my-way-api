@@ -1,63 +1,16 @@
 import json
 import unittest
-from application import create_app, db
+from baseUserAccountSetUp import BaseUserAccount
 
-class SignTests(unittest.TestCase):
+class SignUpTests(BaseUserAccount):
 
     def setUp(self):
         """Prepare testing environment."""
 
-        self.app = create_app('testing')
-        self.app = self.app.test_client()
-
-        self.userData = {
-            "email": "meshmbuvi@gmail.com",
-            "username": "musyoka",
-            "driver": True,
-            "password": "mbuvi1",
-            "phone": "0719800509",
-            "confirm password": "mbuvi1"
-        }
-        self.data_with_unmatching_passwords = {
-            "email": "meshmbuvi@gmail.com",
-            "username": "mbuvi1",
-            "driver": False,
-            "password": "mbuvi1",
-            "phone": "0719800509",
-            "confirm password": "mbuvi11"
-        }
-        self.data_with_invali_email = {
-            "email": "meshmbuvi",
-            "username": "mbuvi1",
-            "driver": False,
-            "password": "mbuvi1",
-            "phone": "0719800509",
-            "confirm password": "mbuvi1"
-        }
-        self.data_with_empty_password = {
-            "email": "meshmbuvi@gmail.com",
-            "username": "mbuvi",
-            "driver": True,
-            "password": "  ",
-            "phone": "0719800509",
-            "confirm password": "  "
-        }
-
-        self.data_with_short_password = {
-            "email": "meshmbuvi@gmail.com",
-            "username": "mbuvi",
-            "driver": True,
-            "password": "mfcf",
-            "phone": "0719800509",
-            "confirm password": "mfcf"
-        }
-
-        self.db = db
-        self.db.create_all()
+        super().setUp()
 
     def tearDown(self):
-        self.app = None
-        self.db.drop_all()
+        super().tearDown()
 
     def test_user_can_sign_up(self):
         """test user can create an account."""
@@ -105,7 +58,7 @@ class SignTests(unittest.TestCase):
                          'User exists.')
 
     def test_user_cannot_sign_up_with_empty_passwords(self):
-        """test user cannot sign up with empty fields."""
+        """test user cannot sign up with empty password fields."""
         response = self.app.post('/api/v1/auth/signup',
                                  data=json.dumps(
                                      self.data_with_empty_password),
@@ -116,7 +69,7 @@ class SignTests(unittest.TestCase):
                          'Please ensure all fields are non-empty.')
 
     def test_password_cannot_be_less_than_six_characters(self):
-        """test user cannot sign up with empty fields."""
+        """test user cannot sign up with password which is less than 6 characters long."""
         response = self.app.post('/api/v1/auth/signup',
                                  data=json.dumps(
                                      self.data_with_short_password),

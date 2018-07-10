@@ -64,7 +64,7 @@ class Rides(Resource):
             if not isinstance(data['available space'], int):
                 return {'message': 'available space can only be numbers.'}, 400
             if past_date(data['start time']) == True:
-                return {'message': 'Cannot create an expired ride'}, 403
+                return {'message': 'Cannot create an expired ride'}, 400
 
             query = "SELECT driver from users where username='{}'"\
                 .format(current_user)
@@ -77,7 +77,6 @@ class Rides(Resource):
                 # set id for the ride offer
 
                 start_time = convert_date(data['start time'])
-                print(type(start_time), start_time)
                 if type(start_time) == type(str("")):
                     query = "SELECT * from rides where start_point='{}'\
                      and destination = '{}' and start_time='{}' \
@@ -106,6 +105,37 @@ class Rides(Resource):
         else:
             return {'message':
                     'make sure you provide all required fields.'}, 400
+
+    @jwt_required
+    def put(self,ride_id):
+        query = "select * from rides where ride_id='{}'".format(ride_id)
+        result = db.execute(query)
+        ride = result.fetchone()
+        if ride is None:
+            return {'message': 'Offer with given id does not exist'}, 404
+        
+        data = request.get_json()
+        if not isinstance(data['available space'], int):
+                return {'message': 'available space can only be numbers.'}, 400
+
+        start_time=convert_date(data['start time'])
+        if type(start_time) != type(str("")):
+            """time is not in the correct format"""
+            return start_time
+
+        if past_date(start_time) == True:
+            return {'message': 'Cannot create an expired ride'}, 400
+
+        query = "update rides set start_point='{}',destination='{}', start_time='{}',\
+                 route='{}', available_space='{}' where ride_id='{}'"\
+                 . format(data['start point'], data['destination'], data['start time'],\
+                  data['route'], data['available space'] ,int(ride_id))
+        db.execute(query)
+        query = "select * from rides where ride_id='{}'".format(ride_id)
+        result = db.execute(query)
+        ride = result.fetchone()
+        return jsonify({'id': ride[0],'start point': ride[2], 'destination': ride[3],\
+         'start time': ride[4], 'route': ride[5], 'available seats': ride[6]})
 
 
 class AllRides(Resource):
@@ -171,6 +201,8 @@ class JoinRide(Resource):
                             . format(current_user)
             result = db.execute(query)
             user_row = result.fetchone()
+            if user_row is None:
+                return {'message': 'User not found'}, 404
             user_id = user_row[0]
             # Find the particular ride offer to check its availability
             query = "SELECT * from rides where ride_id = '{}'" . format(
@@ -179,16 +211,25 @@ class JoinRide(Resource):
             row = result.fetchone()
             if row is None:
                 return {'message': 'That ride does not exist'}, 404
-            time = (row[4])
             # check whether this ride offer belongs to the user
             if user_id == row[1]:
                 return {'message':
                         'You cannot request to join your own offer'}, 403
+            request_data = request.get_json()
+            if 'pick-up point' not in request_data or 'drop-off point' not in request_data or\
+                   'seats_booked' not in request_data:
+                   return {'message': 'provide pick-up and drop-off points, and number of seats you want to book. '}, 400
+            
+            pick_up = request_data['pick-up point']
+            drop_off = request_data['drop-off point']
+            seats_booked = request_data['seats_booked']
+            status = 'pending'
             # # check whether ride offer has any remaining space
-            if row[6] < 1:
-                return {'message': 'Ride offer has no available space'}, 404
+            if row[6] < seats_booked:
+                return {'message': 'No available space for you.'}, 403
 
-            # check whether ride offer is expired 
+            # check whether ride offer is expired
+            time = (row[4])
             if time > datetime.now():
                 # check whether users has alread requested given ride offer
                 query = "SELECT * from requests where user_id = (SELECT users.user_id \
@@ -196,12 +237,13 @@ class JoinRide(Resource):
                     . format(current_user, ride_id)
                 result = db.execute(query)
                 result = result.fetchone()
-                if result is None:
+                if result is None:                    
                     # save user requests now
-                    query = "INSERT INTO requests (date_created, ride_id, user_id, status)\
-                                values('{}', '{}', '{}', '{}')"\
-                                 . format(datetime.now(), ride_id,
-                                          user_id, False)
+                    query = "INSERT INTO requests (date_created, ride_id, user_id, pick_up_point,\
+                    drop_off_point, seats_booked, status)\
+                                values('{}', '{}', '{}', '{}', '{}', '{}', '{}')"\
+                                 . format(datetime.now(), ride_id, user_id, pick_up, drop_off, \
+                                  seats_booked, status)
                     db.execute(query)
                     return {'message': 'Your request has been send.'}, 201
 
@@ -213,6 +255,7 @@ class JoinRide(Resource):
                 return {'message':
                         'The ride requested has already expired'}, 403
         except Exception as e:
+            print(e)
             return {'message': 'Request not successful.'}, 500
 
 
@@ -233,20 +276,20 @@ class Requests(Resource):
             row = result.fetchone()
             owner_id = row[0]
 
-            query = "SELECT username,phone,start_point,destination,\
+            query = "SELECT username,phone,pick_up_point,drop_off_point, seats_booked, \
             start_time,status, req_id from users INNER JOIN requests \
                     ON requests.user_id = users.user_id INNER JOIN \
-                    rides on rides.ride_id = '{}' and rides.owner_id = '{}'" \
+                    rides on rides.ride_id = '{}' where rides.owner_id = '{}'" \
                     . format(ride_id, owner_id)
             result = db.execute(query)
             rows = result.fetchall()
             if len(rows) > 0:
-                return jsonify([{'Request Id':row[6],'name of user': row[0], 'user phone contact': row[1],
+                return jsonify([{'Request Id':row[7],'name of user': row[0], 'user phone contact': row[1],
                                  'pick up point': row[2],
-                                 'Destination': row[3],
-                                 'start time': row[4],
-                                 'status': 'Accepted' if row[5] is True
-                                 else 'Pending'} for row in rows])
+                                 'drop-off point': row[3],
+                                 'seats booked': row[4],
+                                 'start time': row[5],
+                                 'status': row[6]} for row in rows])
             return {'message': "You don't have any ride offer. "}, 404
         except Exception as e:  return e, 500
 
@@ -262,53 +305,53 @@ class RequestActions(Resource):
         """Driver can accept or reject the ride offer."""
         try:
             data = request.get_json()
-            action = False
+            action = ''
             response = ''
             # check whether driver already accepted the offer.
-            query = "select status from requests where req_id='{}'".format(requestId)
+            query = "select status,seats_booked from requests where req_id='{}'".format(requestId)
             result = db.execute(query)
-            status = result.fetchone()
+            result_rows = result.fetchone()
 
             query = "select available_space from rides where ride_id='{}'"\
                         .format((rideId))
             result = db.execute(query)
             seats = result.fetchone()
-            available_seats = seats[0]
+            available_seats = seats[0]            
 
             # check for action to take
             if data['action'].lower() == 'accept':
-                if status[0]:
+                if result_rows[0] == 'accepted':
                     return {'message': 'You already accepted this user request'},403
-                action = True                
+                action = 'accepted'                
                 # Decrement the available seats by one
-                available_seats -= 1
+                available_seats -= result_rows[1]
                 
                 # set message to be returned to user after request update cycle
                 response = {'message': 'Request accepted'}
             else:
                 # Reject an already accepted request; this means available seats should be incremented
-                if status[0]:
-                    available_seats += 1
+                if result_rows[0] == 'accepted' :
+                    available_seats += result_rows[1]
+                    response = {'message': 'Request canceled'}
+                    action = 'canceled'
+                elif result_rows[0] == 'rejected':
+                    return {'message': 'Request already rejected'}
                 else:
-                    return {'message': 'Request is rejected'}
-                    
-                response = {'message': 'Request rejected'}
-
-            query = "UPDATE requests SET status = '{}'\
-             where requests.req_id = '{}'" \
-             . format(action, (requestId))
+                    action = 'rejected'
+                    response = {'message': 'Request rejected'}   
+            query = "update requests set status='{}' where requests.req_id='{}'" \
+             . format(action, int(requestId))
             db.execute(query)
 
             query = "update rides set available_space='{}' where ride_id='{}'"\
                         .format(int(available_seats), rideId)
             db.execute(query)
-
             return response
 
         except Exception as e: return e, 500
 
 
-api.add_resource(Rides, '/users/rides')
+api.add_resource(Rides, '/users/rides', '/users/rides/<ride_id>')
 api.add_resource(AllRides, '/rides')
 api.add_resource(SingleRide, '/rides/<string:ride_id>')
 api.add_resource(JoinRide, '/rides/<ride_id>/requests')

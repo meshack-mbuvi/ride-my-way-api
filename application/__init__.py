@@ -5,7 +5,8 @@ from flask_jwt_extended import JWTManager
 from application.config import configuration
 from application.manage import Database
 
-db = Database()
+db = None
+jwt = None
 def create_app(config, database=None):
     app = Flask(__name__, instance_relative_config=True, static_folder=None)
     app.config.from_object(configuration[config])
@@ -21,9 +22,17 @@ def create_app(config, database=None):
               description='Ride-my-way App is a carpooling application \
               that provides drivers with the ability to create ride offers \
               and passengers to join the ride offers.')
-    doc = ('/api/v1/documentation')
-
+    global jwt
     jwt = JWTManager(app)
+    jwt._set_error_handler_callbacks(api)
+
+    # @app.errorhandler(jwt.expired_token_loader)
+    # def handle_expired_error(e):
+    #     return {'message': 'Token has expired'}
+
+    global db
+    db = Database(app.config)
+
     from application.views import blacklist
 
     @jwt.token_in_blacklist_loader

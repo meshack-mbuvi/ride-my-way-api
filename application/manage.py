@@ -3,11 +3,11 @@ from psycopg2 import connect
 
 class Database(object):
 
-    def __init__(self):
-        self.dbname = os.getenv("DATABASE_NAME")
-        self.user = os.getenv("USER")
-        self.password = os.getenv("PASSWORD")
-        self.host = os.getenv("HOST")
+    def __init__(self, app_config):
+        self.dbname = app_config.get('DATABASE_NAME')
+        self.user = app_config.get('USER')
+        self.password = app_config.get('PASSWORD')
+        self.host = app_config.get('HOST')
         print("...connecting...")
         connection = connect(database=self.dbname,
                              user=self.user, host=self.host, password=self.password)
@@ -18,6 +18,8 @@ class Database(object):
         print("... starting creation of relations")
         commands = (
             'CREATE TABLE IF NOT EXISTS users (user_id serial PRIMARY KEY, \
+                        firstname varchar(255), \
+                        secondname varchar(255), \
                         username varchar(255), \
                         email varchar(50) NOT NULL, \
                         password varchar(255) NOT NULL, \
@@ -35,7 +37,10 @@ class Database(object):
                        date_created timestamp,\
                        ride_id serial,\
                        user_id serial,\
-                       status boolean, \
+                       pick_up_point varchar(50) NOT NULL, \
+                       drop_off_point varchar(50) NOT NULL, \
+                       seats_booked int NOT NULL, \
+                       status varchar(50) NOT NULL, \
                        FOREIGN KEY (ride_id) REFERENCES rides(ride_id), \
                        FOREIGN KEY (user_id) REFERENCES users(user_id) )'
         )

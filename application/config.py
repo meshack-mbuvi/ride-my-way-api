@@ -10,31 +10,26 @@ class Config(object):
     JWT_SECRET_KEY = 'You and me knows very well it is secret'
     JWT_BLACKLIST_ENABLED = True
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
-    os.environ["DATABASE_NAME"] = "ridemyway"
-    os.environ["USER"] = "ridemyway"
-    os.environ["PASSWORD"] = "ridemyway"
-    os.environ["HOST"] = "localhost"  
-
+    PASSWORD = os.getenv('APP_PASSWORD')
+    HOST = os.getenv('APP_HOST')
+    USER = os.getenv('APP_USER')
 
 class ProductionConfig(Config):
     DEBUG = True
-
+    DATABASE_NAME = os.getenv('DATABASE_NAME')
+    PASSWORD = os.getenv('PASSWORD')
+    HOST = os.getenv('HOST')
+    USER = os.getenv('USER')
 
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
-    os.environ["DATABASE_NAME"] = "ridemyway"
-    os.environ["USER"] = "ridemyway"
-    os.environ["PASSWORD"] = "ridemyway"
-    os.environ["HOST"] = "localhost"
-
+    DATABASE_NAME = os.getenv('APP_DATABASE')
 
 class TestingConfig(Config):
     TESTING = False
     DEBUG = True
-    os.environ["DATABASE_NAME"] = "test"
-    os.environ["USER"] = "ridemyway"
-    os.environ["PASSWORD"] = "ridemyway"
+    DATABASE_NAME = os.getenv('TEST_DATABASE')
 
 
 configuration = {
