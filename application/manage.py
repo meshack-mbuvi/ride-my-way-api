@@ -9,10 +9,8 @@ class Database(object):
         self.password = app_config.get('PASSWORD')
         self.host = app_config.get('HOST')
         print("...connecting...")
-        connection = connect(database=self.dbname,
-                             user=self.user, host=self.host, password=self.password)
-        connection.autocommit = True
-        self.connection = connection
+        self.connection = connect(database=self.dbname,user=self.user, host=self.host, password=self.password)
+        self.connection.autocommit = True
 
     def create_all(self):
         print("... starting creation of relations")
@@ -85,5 +83,4 @@ class Database(object):
 
 
 if __name__ == '__main__':
-    dbObject = Database()
-    dbObject.create_all()
+    print("This file needs to be imported and linked with app configuration file.")
