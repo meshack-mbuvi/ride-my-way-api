@@ -53,7 +53,7 @@ class LoginTests(BaseUserAccount):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response_data['message'],
-                         'Password or username cannot be empty.')
+                         'Password or email cannot be empty.')
 
 if __name__ == '__main__':
     unittest.main()

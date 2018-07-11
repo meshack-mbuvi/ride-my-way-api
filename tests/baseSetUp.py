@@ -21,7 +21,6 @@ class Base(unittest.TestCase):
             "firstname":"sita",
             "secondname":"mbevo",
             "email": "mesh@gmail.com",
-            "username": "sita",
             "driver": True,
             "password": "mbuvi1",
             "phone": "0719800509",
@@ -34,7 +33,6 @@ class Base(unittest.TestCase):
         # login to get token
         user_login_data = {
             "email": "mesh@gmail.com",
-            "username": "sita",
             "password": "mbuvi1"
         }
         response = self.app.post('/api/v1/auth/login',
@@ -53,7 +51,6 @@ class Base(unittest.TestCase):
             "firstname":"passenger1",
             "secondname":"passenger1",
             "email": "passenger1@gmail.com",
-            "username": "passenger1",
             "driver": False,
             "password": "mbuvi1",
             "phone": "0719800519",
@@ -64,7 +61,7 @@ class Base(unittest.TestCase):
                                  content_type='application/json')
         # login to get token
         passenger_login_data = {
-            "username": "passenger1",
+            "email": "passenger1@gmail.com",
             "password": "mbuvi1"
         }
         response = self.app.post('/api/v1/auth/login',

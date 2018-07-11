@@ -15,7 +15,6 @@ class BaseUserAccount(unittest.TestCase):
             "firstname":"meshack",
             "secondname":"musyoka",
             "email": "meshmbuvi@gmail.com",
-            "username": "musyoka",
             "driver": True,
             "password": "mbuvi1",
             "phone": "0719800509",
@@ -27,18 +26,17 @@ class BaseUserAccount(unittest.TestCase):
             "password": "mbuvimusyoka",
         }
         self.user_not_exist = {
-            "username": "musyokawewrrwr",
+            "email": "meshmbuvi@gmail3435xbfg.com",
             "password": "mbuvimusyoka",
         }
         self.login_with_empty_password = {
-            "username": "musyoka",
+            "email": "meshmbuvi@gmail.com",
             "password":""
         }
         self.data_with_unmatching_passwords = {
             "firstname":"mbuvi",
             "secondname":"kamila",
             "email": "meshmbuvi@gmail.com",
-            "username": "mbuvi1",
             "driver": False,
             "password": "mbuvi1",
             "phone": "0719800509",
@@ -48,7 +46,6 @@ class BaseUserAccount(unittest.TestCase):
             "firstname":"mbuvi",
             "secondname":"kamila",
             "email": "meshmbuvi@gmail",
-            "username": "mbuvi1",
             "driver": False,
             "password": "mbuvi1",
             "phone": "0719800509",
@@ -58,7 +55,6 @@ class BaseUserAccount(unittest.TestCase):
             "firstname":"mbuvi",
             "secondname":"kamila",
             "email": "meshmbuvi@gmail.com",
-            "username": "mbuvi",
             "driver": True,
             "password": "  ",
             "phone": "0719800509",
@@ -69,7 +65,6 @@ class BaseUserAccount(unittest.TestCase):
             "firstname":"mbuvi",
             "secondname":"kamila",
             "email": "meshmbuvi@gmail.com",
-            "username": "mbuvi",
             "driver": True,
             "password": "mfcf",
             "phone": "0719800509",

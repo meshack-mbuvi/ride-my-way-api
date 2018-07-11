@@ -57,7 +57,7 @@ class Rides(Resource):
     def post(self):
         """Creates a new ride offer"""
         data = request.get_json()
-        current_user = get_jwt_identity()
+        current_user_email = get_jwt_identity()
         # Check whether there is data
         if any(data):
             # save ride to data structure
@@ -66,8 +66,8 @@ class Rides(Resource):
             if past_date(data['start time']) == True:
                 return {'message': 'Cannot create an expired ride'}, 400
 
-            query = "SELECT driver from users where username='{}'"\
-                .format(current_user)
+            query = "SELECT driver from users where email='{}'"\
+                .format(current_user_email)
             result = db.execute(query)
             row = result.fetchone()
             if row[0] is False:
@@ -81,9 +81,9 @@ class Rides(Resource):
                     query = "SELECT * from rides where start_point='{}'\
                      and destination = '{}' and start_time='{}' \
                      and owner_id=(SELECT user_id from users \
-                     where username='{}')" . format(data['start point'],
+                     where email='{}')" . format(data['start point'],
                                                     data['destination'],
-                                                    start_time, current_user)
+                                                    start_time, current_user_email)
 
                     result = db.execute(query)
                     row = result.fetchone()
@@ -91,7 +91,7 @@ class Rides(Resource):
                         data['start time'] = start_time
                         ride_offer = RideOffer(data)
                         # save data here
-                        ride_offer.save(current_user)
+                        ride_offer.save(current_user_email)
                         return {'message':
                                 'ride offer added successfully.'}, 201
                     return {'message': 'offer exists.'}, 409
@@ -194,11 +194,11 @@ class JoinRide(Resource):
         """Sends user request to join a ride offer"""
         try:
             # sample user
-            current_user = get_jwt_identity()
+            current_user_email = get_jwt_identity()
             # Get user ID
             query = "SELECT users.user_id \
-                            from users where username='{}'"\
-                            . format(current_user)
+                            from users where email='{}'"\
+                            . format(current_user_email)
             result = db.execute(query)
             user_row = result.fetchone()
             if user_row is None:
@@ -233,8 +233,8 @@ class JoinRide(Resource):
             if time > datetime.now():
                 # check whether users has alread requested given ride offer
                 query = "SELECT * from requests where user_id = (SELECT users.user_id \
-                            from users where username='{}') and ride_id = {}"\
-                    . format(current_user, ride_id)
+                            from users where email='{}') and ride_id = {}"\
+                    . format(current_user_email, ride_id)
                 result = db.execute(query)
                 result = result.fetchone()
                 if result is None:                    
@@ -246,9 +246,6 @@ class JoinRide(Resource):
                                   seats_booked, status)
                     db.execute(query)
                     return {'message': 'Your request has been send.'}, 201
-
-                    # update the available space to reflect this new request
-                    query = "UPDATE rides set 'available space'='{}'" .format((row[6] - 1))
                 # user has already requested to join this ride offer
                 return{'message': 'You already requested this ride.'}, 403
             else:
@@ -269,14 +266,14 @@ class Requests(Resource):
         """Retrieves all requests to a given ride"""
         try:
             # get owner id
-            query = "SELECT user_id from users where username='{}'"\
+            query = "SELECT user_id from users where email='{}'"\
                 .format(get_jwt_identity()
                         )
             result = db.execute(query)
             row = result.fetchone()
             owner_id = row[0]
 
-            query = "SELECT username,phone,pick_up_point,drop_off_point, seats_booked, \
+            query = "SELECT firstname,phone,pick_up_point,drop_off_point, seats_booked, \
             start_time,status, req_id from users INNER JOIN requests \
                     ON requests.user_id = users.user_id INNER JOIN \
                     rides on rides.ride_id = '{}' where rides.owner_id = '{}'" \

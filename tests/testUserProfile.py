@@ -13,7 +13,6 @@ class UserProfileTests(BaseUserAccount):
             "firstname":"mbuvi",
             "secondname":"kamila",
             "email": "philip@gmail.com",
-            "username": "philip",
             "driver": True,
             "password": "mbuvi1",
             "phone": "0719800509",
@@ -39,7 +38,7 @@ class UserProfileTests(BaseUserAccount):
                                             'Authorization': 'Bearer {}'.format(self.token)})        
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.get_data().decode('utf-8'))
-        self.assertEqual(response_data['username'], 'philip')
+        self.assertEqual(response_data['email'], 'philip@gmail.com')
 
 
 if __name__ == '__main__':

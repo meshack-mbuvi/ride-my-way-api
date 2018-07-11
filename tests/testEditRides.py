@@ -49,7 +49,6 @@ class EditRides(Base):
         self.assertEqual(response.status_code, 400)
 
         response_data = json.loads(response.get_data().decode('utf-8'))
-        print(response_data)
         self.assertEqual(response_data['message'],
                          "use correct format for date and time.")
 
