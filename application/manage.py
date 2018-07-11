@@ -21,8 +21,8 @@ class Database(object):
                         secondname varchar(255), \
                         email varchar(50) NOT NULL, \
                         password varchar(255) NOT NULL, \
-                        phone varchar(255) NOT NULL, driver boolean ),\
-                        UNIQUE(email)',
+                        phone varchar(255) NOT NULL, driver boolean,\
+                        UNIQUE(email))',
 
             'CREATE TABLE IF NOT EXISTS rides (ride_id serial PRIMARY KEY, \
                        owner_id serial, \
