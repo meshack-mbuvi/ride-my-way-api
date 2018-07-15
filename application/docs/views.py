@@ -8,4 +8,4 @@ docs = Blueprint('docs', __name__, static_folder='static',
 def index():
     "Show an index template"
 
-    return render_template('output.html')
+    return render_template('docs.html')
