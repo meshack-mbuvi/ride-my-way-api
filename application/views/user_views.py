@@ -19,7 +19,7 @@ usermodel = api.model('sign up', {
     'email': fields.String(description='Your email address'),
     'phone': fields.Integer(description='Your phone number'),
     'password': fields.String(description='Your password'),
-    'confirm password': fields.String(description='confirm password'),
+    'confirm_password': fields.String(description='confirm password'),
     'driver': fields.Boolean(description='true if driver, false otherwise')
 })
 
@@ -40,11 +40,11 @@ class UserSignUp(Resource):
         userData = request.get_json()
         firstname = userData['firstname']
         secondname = userData['secondname']
-        confirmPassword = userData['confirm password']
+        confirmPassword = userData['confirm_password']
         phone = userData['phone']
         email = userData['email']
         password = userData["password"]
-
+        
         if email == "" or phone.strip() == ""\
                 or confirmPassword.strip() == "" or password.strip() == ""\
                 or firstname.strip() == "" or secondname.strip() == "":

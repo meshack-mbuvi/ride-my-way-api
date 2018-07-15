@@ -24,7 +24,7 @@ class Base(unittest.TestCase):
             "driver": True,
             "password": "mbuvi1",
             "phone": "0719800509",
-            "confirm password": "mbuvi1"
+            "confirm_password": "mbuvi1"
         }
         self.app.post('/api/v1/auth/signup',
                         data=json.dumps(self.user_data),
@@ -54,7 +54,7 @@ class Base(unittest.TestCase):
             "driver": False,
             "password": "mbuvi1",
             "phone": "0719800519",
-            "confirm password": "mbuvi1"
+            "confirm_password": "mbuvi1"
         }
         self.app.post('/api/v1/auth/signup',
                                  data=json.dumps(self.passenger),
