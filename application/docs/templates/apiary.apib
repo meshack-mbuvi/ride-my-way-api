@@ -1,27 +1,27 @@
 FORMAT: 1A
-HOST: https://rmw-api.herokuapp.com
+HOST: https://ridemyway-carpool.herokuapp.com
 
 # Ride my way-api
 Ride-my-way App is a carpooling application that provides drivers with the ability to create ride offers and passengers to join the ride offers.
 
-## Create account [/api/v1/auth/signup]
-### new account [POST]
 
- + Request (application/json)
+### New account [POST /api/v1/auth/signup]
+Users register their accounts using this endpoint so that they can access offers or offer their own offers using the platform.
+
++ Request (application/json)
+
         
-        
-        [
         {
-            "email": "meshmbuvi@gmail.com",
-            "username": "musyoka",
-            "driver": true,
-            "password": "mbuvi1",
-            "phone": 719800509,
-            "confirm paassword": "mbuvi1"
+            "firstname": "your firstname",
+            "secondname": "your secondname",
+            "email": "your email address",
+            "password": "your password",
+            "phone": "phone number",
+            "confirm_password": "confirm your password"
         }
-        ]
         
- + Response 201 (application/json)
+        
++ Response 201 (application/json)
 
         201
         Content-type:application/json
@@ -31,53 +31,74 @@ Ride-my-way App is a carpooling application that provides drivers with the abili
           }
         ]
         
-## User details [/api/v1/auth/reset]
-### reseting user password [PUT]
 
-User can change his/her account password through this endpoint
+### Reset password [PUT /api/v1/auth/reset_password]
+
+User can change his/her account password through this endpoint. Users need to provide
+their account details(email or username) and the new password.
 
 
 + Request (application/json)
 
+        
         {
-        'username': 'mbuvi', 'new_password': 'meshack'
+            "email": "fill your email here",
+            "password": "your new password",
+            "confirm_password": "confirm your new password"
         }
         
 + Response 200 (application/json)
-        
-        {}
+
+        200
+        Content-type:application/json
+        {
+            "message": "password updated"
+        }
         
         
 
-## User details [/api/v1/auth/login]
-
-### user login [POST]
+### user login [POST /api/v1/auth/login]
 
 User uses this endpoint for login. After successful login, the user is assigned a token.
+To login, user must provide email or username and password.
 
 
 + Request (application/json)
 
         [
             {
-                "username":"mbuvi "," email":"meshmbuvi@gmail.com", "password":"xxxx"
+                "email":"email@gmail.com", "password":"xxxx"
             }
         ]
-        
+
 + Response 201 (application/json)
-        
+    
         [
             {
                 "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzY290Y2guaW8iLCJleHAiOjEzMDA4MTkzODAsIm5hbWUiOiJDaHJpcyBTZXZpbGxlamEiLCJhZG1pbiI6dHJ1ZX0.03f329983b86f7d9a9f5fef85305880101d5e302afafa20154d094b229f75773",
                 "message":"logged in"
             }
         ]
+
+
+### user login [GET /api/v1/auth/profile]
+
+Through this endpoint, logged-in users can view their account details
+
+     
++ Response 200 (application/json)
+
         
+        {
+            "firstname": "your firstname",
+            "secondname": "your secondname",
+            "email": "your email address",
+            "phone": "phone number"
+        }
         
 
-## create new ride [/api/v1/users/rides]
-
-### New ride [POST]
+### New ride offer [POST /api/v1/users/rides]
+Users offer their rides by creating ride offers using this endpoint. The request to create a ride offer must be in the format shown in the request body.
 
 + Request (application/json)
 
@@ -97,9 +118,9 @@ User uses this endpoint for login. After successful login, the user is assigned 
            "message":"ride offer added successfully."
         }
         
-## Retrieve rides [/api/v1/rides]
 
-### Retrieve all rides [GET]
+### Retrieve all rides [GET /api/v1/rides]
+ Through this endpoint, users can view all available ride offers in the platform
 
 + Response 200 (application/json)
 
@@ -123,10 +144,8 @@ User uses this endpoint for login. After successful login, the user is assigned 
             }
         ]
     
-## Retrieve single ride offers [/api/v1/rides/1]
-
-### GET 
-
+### Retrieve a single ride offer [GET /api/v1/rides/{ride_id}]
+Users retrieve details of a given ride offer through this endpoint.
 + Response 200 (application/json)
 
         [
@@ -140,9 +159,20 @@ User uses this endpoint for login. After successful login, the user is assigned 
             }
         ]
     
-## JOIN Ride offer [/rides/<rideId>/requests]
 
-### Join a particular ride offer [POST]
+### Join a particular ride offer [POST /api/v1/rides/<rideId>/requests]
+Users are able to request to join a ride offer through this endpoint. They need to
+send thier request in the following format.
+
++ Request (application/json)
+
+        [
+            {
+                "pick-up point": "Juja",
+                "drop-off point": "Githurai",
+                "seats_booked" : 3
+            }
+        ]
 
 + Response 201 (application/json)
 
@@ -152,26 +182,34 @@ User uses this endpoint for login. After successful login, the user is assigned 
             }
         ]
     
-    
-## View user request [/api/v1/users/rides/{ride_id}/requests]
 
-### GET
+### View user request [GET /api/v1/users/rides/{ride_id}/requests]
+This endpoint is used by drivers to view all user requests for their ride offers.
+
 + Response 200 (application/json)
 
         [
             {
-                "Destination": "Juja",
+                "drop-off point": "Juja",
                 "name of user": "mbuvi",
                 "pick up point": "Witeithye",
                 "start time": "Mon, 11 Jun 2040 06:00:00 GMT",
-                "status": "Accepted",
+                "status": "Pending",
                 "user phone": "719800509"
+            },
+            {
+                "drop-off point": "Juja",
+                "name of user": "Kamau",
+                "pick up point": "Witeithye",
+                "start time": "Mon, 11 Jun 2040 06:00:00 GMT",
+                "status": "Pending",
+                "user phone": "719801509"
             }
         ]
         
-## Act on user request [/api/v1/users/rides/{ride_id}/requests/requestId]
+### Accept/reject user reques [PUT /api/v1/users/rides/{ride_id}/requests/requestId]
 
-### Accept/reject user reques [PUT]
+Through this endpoint, driver can accept or reject user's request to join a ride offer.
 
 + Request (application/json)
 
@@ -183,7 +221,7 @@ User uses this endpoint for login. After successful login, the user is assigned 
 
         [
             {
-                "message":"Requests accepted"
+                "message":"Request accepted"
             }
         ]
 
