@@ -15,7 +15,7 @@ class Config(object):
     USER = os.getenv('APP_USER')
 
 class ProductionConfig(Config):
-    DEBUG = True
+    DEBUG = False
     DATABASE_NAME = os.getenv('DATABASE_NAME')
     PASSWORD = os.getenv('PASSWORD')
     HOST = os.getenv('HOST')
