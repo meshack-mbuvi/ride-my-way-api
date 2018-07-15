@@ -1,13 +1,14 @@
 from validate_email import validate_email
 from werkzeug.security import generate_password_hash
 
-from . import db
+from application import db
 
 
 class User():
 
     def __init__(self, user_data):
-        self.username = user_data['username']
+        self.firstname = user_data['firstname']
+        self.secondname = user_data['secondname']
         self.email = user_data['email']
         self.password = generate_password_hash(
             user_data['password'], method='sha256')
@@ -16,8 +17,9 @@ class User():
 
     def save(self):
         # insert new record
-        query = "INSERT INTO users (username,email,password,phone,driver)\
-        VALUES ('" + self.username + "', '" + self.email + "', '" + self.password + "', \
-             {},{})". format(self.phone, self.driver)
+        query = "INSERT INTO users (firstname,secondname,email,password,phone,driver)\
+        VALUES ('{}' , '{}', '{}', '{}', '{}', '{}')"\
+                . format(self.firstname, self.secondname ,self.email, self.password,\
+                self.phone, self.driver)
 
         return db.execute(query)

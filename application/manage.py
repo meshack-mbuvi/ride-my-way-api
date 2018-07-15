@@ -3,25 +3,26 @@ from psycopg2 import connect
 
 class Database(object):
 
-    def __init__(self):
-        self.dbname = os.getenv("DATABASE_NAME")
-        self.user = os.getenv("USER")
-        self.password = os.getenv("PASSWORD")
-        self.host = os.getenv("HOST")
-        print("...connecting...")
-        connection = connect(database=self.dbname,
-                             user=self.user, host=self.host, password=self.password)
-        connection.autocommit = True
-        self.connection = connection
+    def __init__(self, app_config):
+        self.dbname = app_config.get('DATABASE_NAME')
+        self.user = app_config.get('USER')
+        self.password = app_config.get('PASSWORD')
+        self.host = app_config.get('HOST')
+        print("...Establishing connection...")
+        self.connection = connect(database=self.dbname,user=self.user, host=self.host, password=self.password)
+        self.connection.autocommit = True
+        print("Connected.")
 
     def create_all(self):
         print("... starting creation of relations")
         commands = (
             'CREATE TABLE IF NOT EXISTS users (user_id serial PRIMARY KEY, \
-                        username varchar(255), \
+                        firstname varchar(255), \
+                        secondname varchar(255), \
                         email varchar(50) NOT NULL, \
                         password varchar(255) NOT NULL, \
-                        phone varchar(255) NOT NULL, driver boolean )',
+                        phone varchar(255) NOT NULL, driver boolean,\
+                        UNIQUE(email))',
 
             'CREATE TABLE IF NOT EXISTS rides (ride_id serial PRIMARY KEY, \
                        owner_id serial, \
@@ -35,7 +36,10 @@ class Database(object):
                        date_created timestamp,\
                        ride_id serial,\
                        user_id serial,\
-                       status boolean, \
+                       pick_up_point varchar(50) NOT NULL, \
+                       drop_off_point varchar(50) NOT NULL, \
+                       seats_booked int NOT NULL, \
+                       status varchar(50) NOT NULL, \
                        FOREIGN KEY (ride_id) REFERENCES rides(ride_id), \
                        FOREIGN KEY (user_id) REFERENCES users(user_id) )'
         )
@@ -80,5 +84,4 @@ class Database(object):
 
 
 if __name__ == '__main__':
-    dbObject = Database()
-    dbObject.create_all()
+    print("This file needs to be imported and linked with app configuration file.")

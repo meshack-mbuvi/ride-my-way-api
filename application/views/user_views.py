@@ -1,10 +1,11 @@
-from validate_email import validate_email
+# from validate_email import validate_email
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import jwt_required, get_raw_jwt, create_access_token, get_jwt_identity
 from werkzeug.security import generate_password_hash
 from flask_restplus import Resource, Namespace, fields
 from flask import request, jsonify
 from datetime import datetime
+import re
 
 from application.models.user_model import User
 from application import db
@@ -13,14 +14,20 @@ from . import blacklist
 api = Namespace('Users', Description='User operations')
 
 usermodel = api.model('sign up', {
-    'username': fields.String(description='your username'),
+    'first name': fields.String(description='your first name'),
+    'second name': fields.String(description='your second name'),
     'email': fields.String(description='Your email address'),
     'phone': fields.Integer(description='Your phone number'),
     'password': fields.String(description='Your password'),
-    'confirm password': fields.String(description='confirm password'),
+    'confirm_password': fields.String(description='confirm password'),
     'driver': fields.Boolean(description='true if driver, false otherwise')
 })
 
+def validate_email(email):
+    match = re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9]+\.[a-zA-Z0-9.]*\.*[com|org|edu]{3}$)",email)
+    if match is not None:
+        return True
+    return False
 
 class UserSignUp(Resource):
 
@@ -31,14 +38,16 @@ class UserSignUp(Resource):
     def post(self):
         """User sign up"""
         userData = request.get_json()
-        username = userData['username']
-        confirmPassword = userData['confirm password']
+        firstname = userData['firstname']
+        secondname = userData['secondname']
+        confirmPassword = userData['confirm_password']
         phone = userData['phone']
         email = userData['email']
         password = userData["password"]
-
-        if username.strip() == "" or email == "" or phone.strip() == ""\
-                or confirmPassword.strip() == "" or password.strip() == "":
+        
+        if email == "" or phone.strip() == ""\
+                or confirmPassword.strip() == "" or password.strip() == ""\
+                or firstname.strip() == "" or secondname.strip() == "":
             return {"message": "Please ensure all fields are non-empty."}, 400
 
         if len(password) < 6:
@@ -51,8 +60,8 @@ class UserSignUp(Resource):
             return {'message': 'Passwords do not match'}, 400
 
         try:
-            query = "select username from users where username='%s'\
-             or email='%s' or phone='%s'" % (username, email, phone)
+            query = "select email from users where email='%s'\
+             or phone='%s'" % (email, phone)
             result = db.execute(query)
             user = result.fetchone()
             if user is None:
@@ -83,21 +92,15 @@ class UserLogin(Resource):
         """
 
         userData = request.get_json()
-        username = userData['username']
+        email = userData['email']
         password = userData['password']
 
-        if username.strip() == "" or password.strip() == "":
-            return {"message": "Password or username cannot be empty."}, 401
+        if email.strip() == "" or password.strip() == "":
+            return {"message": "Password or email cannot be empty."}, 401
 
         try:
-            query = ""
-            if 'email' in userData:
-                email = userData['email']
-                query = "select password from users where email='{}'". format(
-                    email)
-            else:
-                query = "select password from users where username='{}'"\
-                    . format(username)
+            query = "select password from users where email='{}'"\
+                    . format(email)
             result = db.execute(query)
             user = result.fetchone()
 
@@ -105,7 +108,7 @@ class UserLogin(Resource):
                 return {'message': 'User not found.'}, 404
 
             if check_password_hash(user[0], password):
-                token = create_access_token(identity=username)
+                token = create_access_token(identity=email)
                 return {'message': 'logged in.', 'token': token}, 201
             else:
                 return {'message': 'Invalid password.'}, 401
@@ -121,16 +124,15 @@ class ResetPassword(Resource):
     @api.expect(model_login)
     def put(self):
         userData = request.get_json()
-        username = userData['username']
         confirmPassword = userData['confirm password']
         email = userData['email']
         password = userData["password"]
 
-        if username.strip() == "" or email == "" or \
-                confirmPassword.strip() == "" or password.strip() == "":
+        if email.strip() == "" or confirmPassword.strip() == ""\
+             or password.strip() == "":
             return {"message": "Please ensure all fields are non-empty."}, 400
 
-        if len(password) < 6:
+        if len(password.strip()) < 6:
             return {'message': 'passwords should be 6 characters or more.'}, 400
 
         if not (validate_email(email)):
@@ -141,16 +143,16 @@ class ResetPassword(Resource):
 
         # update user details now
         try:
-            query = "SELECT *  from users where username='{}' and email='{}'"\
-                . format(username, email)
+            query = "SELECT *  from users where email='{}'"\
+                . format(email)
             result = db.execute(query)
             row = result.fetchone()
             if row is not None:
                 query = "UPDATE users SET password = '{}' \
-                    where username='{}' and email='{}'"\
+                    where email='{}'"\
                     . format(generate_password_hash(password,
                                                     method='sha256'),
-                             username, email)
+                             email)
                 db.execute(query)
                 return {'message': 'password updated'}
             else:
@@ -172,16 +174,18 @@ class Logout(Resource):
 class Profile(Resource):
     @jwt_required
     def get(self):
-        username = get_jwt_identity()
-        query = "select email, phone, driver from users\
-                   where username='{}'".format(username)
+        email = get_jwt_identity()
+        query = "select firstname,secondname, phone, \
+           driver from users where email='{}'".format(email)
         result = db.execute(query)
         users = result.fetchone()
         user_type = 'Passenger'
-        if users[2] is True:
+        if users[3] is True:
             user_type = 'Driver'
         
-        return {'username': username, 'phone': users[1], 'email':users[0]}, 200
+        return {'firstname': users[0], 'secondname':users[1], \
+                'phone number': users[2], 'email': email, \
+                'user type': user_type}, 200
 
 
 

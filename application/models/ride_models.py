@@ -1,5 +1,5 @@
 from datetime import datetime
-from . import db
+from application import db
 
 
 class RideOffer():
@@ -19,12 +19,12 @@ class RideOffer():
         self.route = ridedata['route']
         self.available_space = ridedata['available space']
 
-    def save(self, current_user):
+    def save(self, current_user_email):
         # insert new record
         query = "INSERT INTO rides (owner_id,start_point,destination,start_time,\
         route,available_space) \
-                VALUES ((SELECT user_id from users where username ='{}'), '{}',\
-                        '{}','{}','{}', '{}')" . format(current_user,
+                VALUES ((SELECT user_id from users where email ='{}'), '{}',\
+                        '{}','{}','{}', '{}')" . format(current_user_email,
                                                         self.start_point,
                                                         self.destination,
                                                         self.start_time,
