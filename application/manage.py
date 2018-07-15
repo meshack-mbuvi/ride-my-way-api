@@ -8,7 +8,7 @@ class Database(object):
         self.user = app_config.get('USER')
         self.password = app_config.get('PASSWORD')
         self.host = app_config.get('HOST')
-        print("...Establishing connection...")
+        print("...Establishing connection to database server...")
         self.connection = connect(database=self.dbname,user=self.user, host=self.host, password=self.password)
         self.connection.autocommit = True
         print("Connected.")
