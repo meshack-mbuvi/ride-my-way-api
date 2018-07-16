@@ -24,7 +24,7 @@ class Passenger():
 
         return db.execute(query)
 
-class driver(Passenger):
+class Driver(Passenger):
 
     def __init__(self, user_data):
         super().__init__(user_data)
