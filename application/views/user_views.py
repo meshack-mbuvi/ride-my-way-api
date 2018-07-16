@@ -7,7 +7,7 @@ from flask import request, jsonify
 from datetime import datetime
 import re
 
-from application.models.user_model import User
+from application.models.user_model import Passenger, Driver
 from application import db
 from . import blacklist
 
@@ -65,8 +65,12 @@ class UserSignUp(Resource):
             result = db.execute(query)
             user = result.fetchone()
             if user is None:
-                userObject = User(userData)
-                userObject.save()
+                if userData['driver'] is True:
+                    userObject = Driver(userData)
+                    userObject.save()
+                else:
+                    userObject = Passenger(userData)
+                    userObject.save()
                 return {'message': 'Account created.'}, 201
             return {'message': 'User exists.'}, 409
         except Exception as e:
@@ -99,7 +103,7 @@ class UserLogin(Resource):
             return {"message": "Password or email cannot be empty."}, 401
 
         try:
-            query = "select password from users where email='{}'"\
+            query = "select password,user_type from users where email='{}'"\
                     . format(email)
             result = db.execute(query)
             user = result.fetchone()
@@ -109,7 +113,8 @@ class UserLogin(Resource):
 
             if check_password_hash(user[0], password):
                 token = create_access_token(identity=email)
-                return {'message': 'logged in.', 'token': token}, 201
+                return {'message': 'logged in.', 'token': token, \
+                        'user_type': user[1]}, 201
             else:
                 return {'message': 'Invalid password.'}, 401
         except Exception as e:
@@ -176,16 +181,12 @@ class Profile(Resource):
     def get(self):
         email = get_jwt_identity()
         query = "select firstname,secondname, phone, \
-           driver from users where email='{}'".format(email)
+           user_type from users where email='{}'".format(email)
         result = db.execute(query)
-        users = result.fetchone()
-        user_type = 'Passenger'
-        if users[3] is True:
-            user_type = 'Driver'
-        
+        users = result.fetchone()     
         return {'firstname': users[0], 'secondname':users[1], \
                 'phone number': users[2], 'email': email, \
-                'user type': user_type}, 200
+                'user type': users[3]}, 200
 
 
 
