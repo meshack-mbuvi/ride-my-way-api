@@ -30,5 +30,4 @@ class RideOffer():
                                                         self.start_time,
                                                         self.route,
                                                         self.available_space)
-        db.execute(query)
-        
+        db.execute(query)        
