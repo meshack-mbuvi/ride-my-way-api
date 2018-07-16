@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash
 from application import db
 
 
-class User():
+class Passenger():
 
     def __init__(self, user_data):
         self.firstname = user_data['firstname']
@@ -13,13 +13,23 @@ class User():
         self.password = generate_password_hash(
             user_data['password'], method='sha256')
         self.phone = user_data['phone']
-        self.driver = user_data['driver']
+        self.user_type = 'passenger'
 
     def save(self):
         # insert new record
-        query = "INSERT INTO users (firstname,secondname,email,password,phone,driver)\
+        query = "INSERT INTO users (firstname,secondname,email,password,phone,user_type)\
         VALUES ('{}' , '{}', '{}', '{}', '{}', '{}')"\
                 . format(self.firstname, self.secondname ,self.email, self.password,\
-                self.phone, self.driver)
+                self.phone, self.user_type)
 
         return db.execute(query)
+
+class Driver(Passenger):
+
+    def __init__(self, user_data):
+        super().__init__(user_data)
+        self.user_type = 'driver'
+
+    def save(self):
+        super().save()
+
