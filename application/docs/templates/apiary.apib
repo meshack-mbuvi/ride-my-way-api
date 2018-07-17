@@ -99,7 +99,7 @@ Through this endpoint, logged-in users can view their account details
         }
         
 
-### New ride offer [POST /api/v1/users/rides]
+## New ride offer [POST /api/v1/users/rides]
 Users offer their rides by creating ride offers using this endpoint. The request to create a ride offer must be in the format shown in the request body.
 
 + Request (application/json)
@@ -120,6 +120,36 @@ Users offer their rides by creating ride offers using this endpoint. The request
            "message":"ride offer added successfully."
         }
         
+## Update details of a ride offer [PUT /api/v1/users/rides/{ride_id}]
+Using this endpoint, users can edit details of a given ride offer.
+
++ Parameters 
+  + ride_id(required, integer)
+
++ Request (application/json)
+
+        [
+            {
+                "start point": "Juja",
+                "destination": "Ngara Market",
+                "route": "Thika superhighway",
+                "start time": "June 10 2030 6:00AM",
+                "available space": 4
+            }
+        ]
+
+
++ Response 200 (application/json)
+
+        {
+            "id": {ride_id},
+            "start point": "Juja",
+            "destination": "Ngara Market",
+            "route": "Thika superhighway",
+            "start time": "June 10 2030 6:00AM", 
+            "available seats": 4
+        }
+
 
 ### Retrieve all rides [GET /api/v1/rides]
  Through this endpoint, users can view all available ride offers in the platform
@@ -148,11 +178,14 @@ Users offer their rides by creating ride offers using this endpoint. The request
     
 ### Retrieve a single ride offer [GET /api/v1/rides/{ride_id}]
 Users retrieve details of a given ride offer through this endpoint.
++ Parameters 
+  + ride_id(required, integer)
+
 + Response 200 (application/json)
 
         [
             {
-                "id":1,
+                "id":ride_id,
                 "start point": "Witeithye",
                 "destination": "Ngara",
                 "route": "Thika superhighway",
@@ -162,10 +195,12 @@ Users retrieve details of a given ride offer through this endpoint.
         ]
     
 
-### Join a particular ride offer [POST /api/v1/rides/<rideId>/requests]
+### Join a particular ride offer [POST /api/v1/rides/{rideId}/requests]
 Users are able to request to join a ride offer through this endpoint. They need to
 send thier request in the following format.
 
++ Parameters 
+  + rideId(required, integer)
 + Request (application/json)
 
         [
@@ -187,6 +222,8 @@ send thier request in the following format.
 
 ### View user request [GET /api/v1/users/rides/{ride_id}/requests]
 This endpoint is used by drivers to view all user requests for their ride offers.
++ Parameters 
+  + ride_id(required, integer)
 
 + Response 200 (application/json)
 
@@ -209,9 +246,11 @@ This endpoint is used by drivers to view all user requests for their ride offers
             }
         ]
         
-### Accept/reject user reques [PUT /api/v1/users/rides/{ride_id}/requests/requestId]
-
+### Accept/reject user request [PUT /api/v1/users/rides/requests/{requestId}]
 Through this endpoint, driver can accept or reject user's request to join a ride offer.
+
++ Parameters 
+  + requestId(required, integer)
 
 + Request (application/json)
 
