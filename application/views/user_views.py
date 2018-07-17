@@ -209,7 +209,7 @@ class AccountUpgrade(Resource):
             query = "select driver from users where email='{}'".format(email)
             result = db.execute(query)
             user_type = result.fetchone()
-            return {'driver': user_type[0]}, 200
+            return {'user type': 'Driver' if user_type[0] else 'Passenger'}, 200
         return {'message': 'Bad format used'}, 400
 
 
