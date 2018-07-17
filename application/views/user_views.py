@@ -204,13 +204,13 @@ class AccountUpgrade(Resource):
         action = request.args['query']
         email = get_jwt_identity()
         if action == 'upgrade':
-            query = "update users set driver='{}' where email='{}'"\
-               .format(True, email)
+            query = "update users set user_type='{}' where email='{}'"\
+               .format('driver', email)
             db.execute(query)
-            query = "select driver from users where email='{}'".format(email)
+            query = "select user_type from users where email='{}'".format(email)
             result = db.execute(query)
             user_type = result.fetchone()
-            return {'user type': 'Driver' if user_type[0] else 'Passenger'}, 200
+            return {'user type': user_type[0]}, 200
         return {'message': 'Bad format used'}, 400
 
 
