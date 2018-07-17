@@ -39,7 +39,7 @@ class RidesRetrievalTests(Base):
 
     def test_filter_rides_by_start_point(self):
         """test user can get rides with specified start_point"""
-        response = self.app.get('/api/v1/rides?key=start_point&start_point=Nairobi',
+        response = self.app.get('/api/v1/rides?key=start_point&start_point=Githurai',
                                 content_type='application/json',
                                 headers=self.headers)
         self.assertEqual(response.status_code, 200)
