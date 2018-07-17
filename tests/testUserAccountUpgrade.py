@@ -38,7 +38,7 @@ class UserProfileTests(BaseUserAccount):
                                             'Authorization': 'Bearer {}'.format(self.token)})        
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.get_data().decode('utf-8'))
-        self.assertEqual(response_data['driver'], True)
+        self.assertEqual(response_data['user type'], 'Driver')
 
     def test_user_uses_correct_format_to_upgrade_an_account(self):
         """test that user uses correct format to upgrade his account"""
