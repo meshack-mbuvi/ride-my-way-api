@@ -11,6 +11,13 @@ from application.models.user_model import Passenger, Driver
 from application import db
 from . import blacklist
 
+try:
+    # Python 3
+    from urllib.parse import urlparse, parse_qs
+except ImportError:
+    # Python 2
+    from urlparse import urlparse, parse_qs
+
 api = Namespace('Users', Description='User operations')
 
 usermodel = api.model('sign up', {
@@ -179,6 +186,7 @@ class Logout(Resource):
 class Profile(Resource):
     @jwt_required
     def get(self):
+        """Retrieves user account details."""
         email = get_jwt_identity()
         query = "select firstname,secondname, phone, \
            user_type from users where email='{}'".format(email)
@@ -189,9 +197,27 @@ class Profile(Resource):
                 'user type': users[3]}, 200
 
 
+class AccountUpgrade(Resource):
+    @jwt_required
+    def put(self):
+        """Upgrades user account for user to be a driver."""
+        action = request.args['query']
+        email = get_jwt_identity()
+        if action == 'upgrade':
+            query = "update users set driver='{}' where email='{}'"\
+               .format(True, email)
+            db.execute(query)
+            query = "select driver from users where email='{}'".format(email)
+            result = db.execute(query)
+            user_type = result.fetchone()
+            return {'user type': 'Driver' if user_type[0] else 'Passenger'}, 200
+        return {'message': 'Bad format used'}, 400
+
+
 
 api.add_resource(UserSignUp, '/auth/signup')
 api.add_resource(UserLogin, '/auth/login')
 api.add_resource(Logout, '/auth/logout')
 api.add_resource(Profile, '/auth/profile')
+api.add_resource(AccountUpgrade, '/auth/upgrade')
 api.add_resource(ResetPassword, '/auth/reset_password')

@@ -97,6 +97,18 @@ Through this endpoint, logged-in users can view their account details
             "phone": "phone number",
             "user_type":"passenger/driver"
         }
+
+
+### Upgrade user account [PUT /api/v1/auth/upgrade?query=upgrade]
+User can upgrade his/her account to be a driver using this endpoint
+
+     
++ Response 200 (application/json)
+
+        
+        {
+            'user-type': 'Driver'
+        }
         
 
 ## New ride offer [POST /api/v1/users/rides]
