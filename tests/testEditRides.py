@@ -36,7 +36,7 @@ class EditRides(Base):
         response = self.app.put('/api/v1/users/rides/1',
                             data=json.dumps(self.ride),
                             content_type='application/json',
-                            headers=self.headers)
+                            headers=self.headers_for_passenger)
         self.assertEqual(response.status_code, 401)
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],'You cannot change \
