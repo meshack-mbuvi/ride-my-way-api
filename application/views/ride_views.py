@@ -113,6 +113,14 @@ class Rides(Resource):
         ride = result.fetchone()
         if ride is None:
             return {'message': 'Offer with given id does not exist'}, 404
+        current_user_email = get_jwt_identity()
+        query =  "select user_id from users where email='{}'"\
+                    . format(current_user_email)
+        result = db.execute(query)
+        user_id = result.fetchone()
+        if not ride[1] == user_id[0]:
+            return {'message': 'You cannot change \
+                        details of ride offer you do not own'}, 401
         
         data = request.get_json()
         if not isinstance(data['available space'], int):
@@ -131,6 +139,7 @@ class Rides(Resource):
                  . format(data['start point'], data['destination'], data['start time'],\
                   data['route'], data['available space'] ,int(ride_id))
         db.execute(query)
+        
         query = "select * from rides where ride_id='{}'".format(ride_id)
         result = db.execute(query)
         ride = result.fetchone()
