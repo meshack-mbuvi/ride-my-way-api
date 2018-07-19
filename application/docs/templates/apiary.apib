@@ -175,6 +175,31 @@ Using this endpoint, users can edit details of a given ride offer.
                 "available space": 9
             }
         ]
+
+### Retrieve all rides which meet search criteria [GET /api/v1/rides?key=search_key&search_key=search_value]
+ Through this endpoint, users can view all available ride offers in the platform
+
++ Response 200 (application/json)
+
+        [
+            {
+               "id":1,
+                "start point": "Witeithye",
+                "destination": "Ngara",
+                "route": "Thika superhighway",
+                "start time": "June 10 2018 6:00AM",
+                "available space": 10
+            },
+           {
+               "id":2,
+                "route": "Thika-Ruaka",
+                "start point": "Thika,Goingwa",
+                "destination": "Ruaka",
+                "route": "Thika superhighway,Northern By-pass",
+                "start time": "June 10 2018 6:00AM",
+                "available space": 9
+            }
+        ]
     
 ### Retrieve a single ride offer [GET /api/v1/rides/{ride_id}]
 Users retrieve details of a given ride offer through this endpoint.
