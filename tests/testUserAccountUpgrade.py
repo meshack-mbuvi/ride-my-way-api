@@ -3,7 +3,7 @@ import unittest
 from baseUserAccountSetUp import BaseUserAccount
 
 
-class UserProfileTests(BaseUserAccount):
+class UserUpgradeTests(BaseUserAccount):
 
     def setUp(self):
         """Prepare testing environment."""
@@ -38,7 +38,11 @@ class UserProfileTests(BaseUserAccount):
                                             'Authorization': 'Bearer {}'.format(self.token)})        
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.get_data().decode('utf-8'))
+<<<<<<< HEAD
         self.assertEqual(response_data['user type'], 'driver')
+=======
+        self.assertEqual(response_data['user type'], 'Driver')
+>>>>>>> 396afda50fb558c878e5396330daf327bfccea30
 
     def test_user_uses_correct_format_to_upgrade_an_account(self):
         """test that user uses correct format to upgrade his account"""
