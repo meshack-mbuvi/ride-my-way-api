@@ -187,6 +187,13 @@ Using this endpoint, users can edit details of a given ride offer.
                 "available space": 9
             }
         ]
+
+### Retrieve all rides which meet search criteria [GET /api/v1/rides?key=search_key&search_key=search_value]
+ Through this endpoint, users can view all available ride offers meeting the given search criteria
+
++ Response 200 (application/json)
+
+        json data for all rides meeting the given search criteria
     
 ### Retrieve a single ride offer [GET /api/v1/rides/{ride_id}]
 Users retrieve details of a given ride offer through this endpoint.
