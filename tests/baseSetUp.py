@@ -80,6 +80,14 @@ class Base(unittest.TestCase):
             "available space": 6
         }
 
+        self.another_ride = {
+            "start point": "Githurai",
+            "destination": "Nairobi",
+            "route": "Thika superhighway",
+            "start time": "June 10 2030 6:00AM",
+            "available space": 3
+        }
+
         self.past_ride = {
             "start point": "Witeithye",
             "destination": "Ngara",

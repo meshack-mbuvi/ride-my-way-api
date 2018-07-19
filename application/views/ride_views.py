@@ -66,16 +66,14 @@ class Rides(Resource):
             if past_date(data['start time']) == True:
                 return {'message': 'Cannot create an expired ride'}, 400
 
-            query = "SELECT driver from users where email='{}'"\
+            query = "SELECT user_type from users where email='{}'"\
                 .format(current_user_email)
             result = db.execute(query)
             row = result.fetchone()
-            if row[0] is False:
+            if row[0] == 'passenger':
                 return "Please upgrade your account to be a driver to access this service", 401
 
             try:
-                # set id for the ride offer
-
                 start_time = convert_date(data['start time'])
                 if type(start_time) == type(str("")):
                     query = "SELECT * from rides where start_point='{}'\
@@ -154,6 +152,19 @@ class AllRides(Resource):
              responses={200: 'OK', 404: 'NOT FOUND'})
     def get(self):
         """Retrieves all available rides"""
+        offer_filter = request.args
+        if len(offer_filter) > 0:
+            search_key = offer_filter['key']
+            search_value = offer_filter['{}'.format(search_key)]
+            query = "SELECT * from rides where {}='{}'".format(search_key, search_value)
+            result = db.execute(query)
+            rows = result.fetchall()
+            return jsonify([
+                {'id': row[0], 'start point': row[2],
+                 'destination': row[3], 'start_time': row[4], 'route': row[5],
+                 'available space': row[6]}
+                for row in rows])
+
         try:
             query = "SELECT * from rides"
             result = db.execute(query)
