@@ -3,7 +3,7 @@ import unittest
 from baseUserAccountSetUp import BaseUserAccount
 
 
-class UserProfileTests(BaseUserAccount):
+class UserUpgradeTests(BaseUserAccount):
 
     def setUp(self):
         """Prepare testing environment."""
