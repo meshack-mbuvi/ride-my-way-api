@@ -131,12 +131,24 @@ Users offer their rides by creating ride offers using this endpoint. The request
         {
            "message":"ride offer added successfully."
         }
-        
-## Update details of a ride offer [PUT /api/v1/users/rides/{ride_id}]
-Using this endpoint, users can edit details of a given ride offer.
 
-+ Parameters 
-  + ride_id(required, integer)
+
+## Modify data for ride offer [/api/v1/users/rides/{ride_id}]
++ Parameters
+    + ride_id(required, integer)
+
+
+### Delete ride offer [DELETE]
+This endpoint can be used by Users to delete their rides.
+    
++ Response 200 (application/json)
+
+        {
+           "message":"Ride offer deleted successfully"
+        }        
+
+### Update details of a ride offer [PUT]
+Using this endpoint, users can edit details of a given ride offer.
 
 + Request (application/json)
 
@@ -163,7 +175,9 @@ Using this endpoint, users can edit details of a given ride offer.
         }
 
 
-### Retrieve all rides [GET /api/v1/rides]
+## Retrieve ride offers [/api/v1/rides]
+
+### All rides [GET ]
  Through this endpoint, users can view all available ride offers in the platform
 
 + Response 200 (application/json)
