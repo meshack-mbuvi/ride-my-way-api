@@ -230,7 +230,7 @@ Users retrieve details of a given ride offer through this endpoint.
 
 ### Join a particular ride offer [POST /api/v1/rides/{rideId}/requests]
 Users are able to request to join a ride offer through this endpoint. They need to
-send thier request in the following format.
+send their request in the following format.
 
 + Parameters 
   + rideId(required, integer)
@@ -277,6 +277,17 @@ This endpoint is used by drivers to view all user requests for their ride offers
                 "status": "Pending",
                 "user phone": "719801509"
             }
+        ]
+
+### Cancel request to a ride offer request [DELETE /api/v1/users/rides/{ride_id}/requests]
+This endpoint is used by drivers to view all user requests for their ride offers.
++ Parameters 
+  + ride_id(required, integer)
+
++ Response 200 (application/json)
+
+        [
+            {"message": "Your request has been deleted."}
         ]
         
 ### Accept user request [PUT /api/v1/users/rides/requests/{request_id}?action=accept]

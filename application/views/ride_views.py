@@ -356,6 +356,23 @@ class Requests(Resource):
 
         except Exception as e: return e, 500
 
+    @jwt_required
+    def delete(self, ride_id):
+        query = "select user_id from users where email='{}'".format(get_jwt_identity())
+        result = db.execute(query)
+        user_id = result.fetchone()
+
+        query = "select * from requests where ride_id='{}' and user_id='{}'"\
+                .format(ride_id, user_id[0])
+        result = db.execute(query)
+        if len(result.fetchall()) > 0:
+            query = "delete from requests where ride_id='{}' and user_id='{}'"\
+                .format(ride_id, user_id[0])
+            result = db.execute(query)
+            return {'message': 'Your request has been deleted.'}
+        else:    
+            return {'message': 'Request not found.'}, 404
+
 
 api.add_resource(Rides, '/users/rides', '/users/rides/<ride_id>')
 api.add_resource(AllRides, '/rides', '/rides/<string:ride_id>')
