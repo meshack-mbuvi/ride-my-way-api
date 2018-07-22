@@ -124,7 +124,7 @@ class RidesRetrievalTests(Base):
                                 headers=self.headers)
         self.assertEqual(response.status_code, 404)
         response_data = json.loads(response.get_data().decode('utf-8'))
-        self.assertNotIn('requests', response_data)
+        self.assertEqual(response_data['message'], 'You do not have any ride offer.')
 
     def test_driver_can_accept_user_request(self):
         """test that a driver can accept users request."""
@@ -132,10 +132,8 @@ class RidesRetrievalTests(Base):
                       content_type='application/json',
                       data = json.dumps(self.request_data),
                       headers=self.headers_for_passenger)
-        action = {"action": "accept"}
         # driver accepts ride offer
-        response = self.app.put('/api/v1/users/rides/requests/1',
-                                data=json.dumps(action),
+        response = self.app.put('/api/v1/users/rides/requests/1?action=accept',
                                 content_type='application/json',
                                 headers=self.headers)
         self.assertEqual(response.status_code, 200)
@@ -159,15 +157,11 @@ class RidesRetrievalTests(Base):
                       content_type='application/json',
                       data = json.dumps(self.request_data),
                       headers=self.headers_for_passenger)
-        action = {"action": "accept"}
         # driver accepts ride offer
-        self.app.put('/api/v1/users/rides/requests/1',
-                                data=json.dumps(action),
+        self.app.put('/api/v1/users/rides/requests/1?action=accept',
                                 content_type='application/json',
                                 headers=self.headers)
-        action = {'action': 'canceled'}
-        response = self.app.put('/api/v1/users/rides/requests/1',
-                                data=json.dumps(action),
+        response = self.app.put('/api/v1/users/rides/requests/1?action=cancel',
                                 content_type='application/json',
                                 headers=self.headers)
         response_data = json.loads(response.get_data().decode('utf-8'))
@@ -186,9 +180,7 @@ class RidesRetrievalTests(Base):
                       content_type='application/json',
                       data = json.dumps(self.request_data),
                       headers=self.headers_for_passenger)
-        action = {"action": "reject"}
-        response = self.app.put('/api/v1/users/rides/requests/1',
-                                data=json.dumps(action),
+        response = self.app.put('/api/v1/users/rides/requests/1?action=reject',
                                 content_type='application/json',
                                 headers=self.headers)
         response_data = json.loads(response.get_data().decode('utf-8'))
@@ -200,13 +192,10 @@ class RidesRetrievalTests(Base):
                       content_type='application/json',
                       data = json.dumps(self.request_data),
                       headers=self.headers_for_passenger)
-        action = {"action": "reject"}
-        self.app.put('/api/v1/users/rides/requests/1',
-                                data=json.dumps(action),
+        self.app.put('/api/v1/users/rides/requests/1?action=reject',
                                 content_type='application/json',
                                 headers=self.headers)
-        response = self.app.put('/api/v1/users/rides/requests/1',
-                                data=json.dumps(action),
+        response = self.app.put('/api/v1/users/rides/requests/1?action=reject',
                                 content_type='application/json',
                                 headers=self.headers)
         response_data = json.loads(response.get_data().decode('utf-8'))
