@@ -257,14 +257,12 @@ class JoinRide(Resource):
             return {'message': 'Request not successful.'}, 500
 
 
-@api.route('/users/rides/<ride_id>/requests', '/users/rides/<rideId>/requests/<requestId>')
 class Requests(Resource):
 
     @api.doc('view user requests to a given ride offer',
              responses={200: 'OK', 404: 'NOT FOUND', 401: 'UNAUTHORIZED'},
              params={'ride_id': 'Id for ride user wants to view'})
     @jwt_required
-    # @api.route('/users/rides/<ride_id>/requests')
     def get(self, ride_id):
         """Retrieves all requests to a given ride"""
         try:
@@ -293,25 +291,21 @@ class Requests(Resource):
             return {'message': "You don't have any ride offer. "}, 404
         except Exception as e:  return e, 500
 
-    # @api.doc('view user requests to a given ride offer',
-    #          responses={200: 'OK', 404: 'NOT FOUND', 401: 'UNAUTHORIZED'},
-    #          params={'rideId': 'Id for ride user wants to view',
-    #                  'requestId': 'Id identifying the request'})
     @jwt_required
-    # @api.route('/users/rides/<rideId>/requests/<requestId>')
-    def put(self, rideId, requestId):
+    def put(self, request_id):
         """Driver can accept or reject the ride offer."""
         try:
             data = request.get_json()
             action = ''
             response = ''
             # check whether driver already accepted the offer.
-            query = "select status,seats_booked from requests where req_id='{}'".format(requestId)
+            query = "select status,seats_booked,ride_id from requests where\
+                     req_id='{}'".format(request_id)
             result = db.execute(query)
             result_rows = result.fetchone()
 
             query = "select available_space from rides where ride_id='{}'"\
-                        .format((rideId))
+                        .format((result_rows[2]))
             result = db.execute(query)
             seats = result.fetchone()
             available_seats = seats[0]            
@@ -338,11 +332,11 @@ class Requests(Resource):
                     action = 'rejected'
                     response = {'message': 'Request rejected'}   
             query = "update requests set status='{}' where requests.req_id='{}'" \
-             . format(action, int(requestId))
+             . format(action, int(request_id))
             db.execute(query)
 
             query = "update rides set available_space='{}' where ride_id='{}'"\
-                        .format(int(available_seats), rideId)
+                        .format(int(available_seats), result_rows[2])
             db.execute(query)
             return response
 
@@ -352,4 +346,4 @@ class Requests(Resource):
 api.add_resource(Rides, '/users/rides', '/users/rides/<ride_id>')
 api.add_resource(AllRides, '/rides', '/rides/<string:ride_id>')
 api.add_resource(JoinRide, '/rides/<ride_id>/requests')
-# api.add_resource(Requests, '/users/rides/<ride_id>/requests', '/users/rides/<ride_id>/requests/<requestId>')
+api.add_resource(Requests, '/users/rides/<ride_id>/requests', '/users/rides/requests/<request_id>')
