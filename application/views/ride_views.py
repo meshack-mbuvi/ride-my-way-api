@@ -303,15 +303,14 @@ class Requests(Resource):
                                  'seats booked': row[4],
                                  'start time': row[5],
                                  'status': row[6]} for row in rows])
-            return {'message': "You don't have any ride offer. "}, 404
+            return {'message': "You do not have any ride offer."}, 404
         except Exception as e:  return e, 500
 
     @jwt_required
     def put(self, request_id):
         """Driver can accept or reject the ride offer."""
         try:
-            data = request.get_json()
-            action = ''
+            action = request.args['action']
             response = ''
             # check whether driver already accepted the offer.
             query = "select status,seats_booked,ride_id from requests where\
@@ -326,7 +325,7 @@ class Requests(Resource):
             available_seats = seats[0]            
 
             # check for action to take
-            if data['action'].lower() == 'accept':
+            if action.lower() == 'accept':
                 if result_rows[0] == 'accepted':
                     return {'message': 'You already accepted this user request'},403
                 action = 'accepted'                

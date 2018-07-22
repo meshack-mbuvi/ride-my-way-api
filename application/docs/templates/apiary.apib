@@ -279,18 +279,12 @@ This endpoint is used by drivers to view all user requests for their ride offers
             }
         ]
         
-### Accept/reject user request [PUT /api/v1/users/rides/requests/{request_id}]
+### Accept user request [PUT /api/v1/users/rides/requests/{request_id}?action=accept]
 Through this endpoint, driver can accept or reject user's request to join a ride offer.
 
 + Parameters 
   + request_id(required, integer)
-
-+ Request (application/json)
-
-            {
-            "action": "accept"
-            }
-            
+         
 + Response 200 (application/json)
 
         [
@@ -300,12 +294,12 @@ Through this endpoint, driver can accept or reject user's request to join a ride
         ]
 
 
-+ Request (application/json)
+### Reject user request [PUT /api/v1/users/rides/requests/{request_id}?action=reject]
+Through this endpoint, driver can accept or reject user's request to join a ride offer.
 
-            {
-            "action": "reject"
-            }
-            
++ Parameters 
+  + request_id(required, integer)
+       
 + Response 200 (application/json)
 
         [
