@@ -144,7 +144,22 @@ class Rides(Resource):
         return jsonify({'id': ride[0],'start point': ride[2], 'destination': ride[3],\
          'start time': ride[4], 'route': ride[5], 'available seats': ride[6]})
 
+    @jwt_required
+    def delete(self,ride_id):        
+        query = "select user_id from users where email='{}'".format(get_jwt_identity())
+        result = db.execute(query)
+        user_id = result.fetchone()
 
+        query = "select * from rides where ride_id='{}' and owner_id='{}'"\
+                .format(ride_id, user_id[0])
+        result = db.execute(query)
+        if len(result.fetchall()) > 0:
+            query = "delete from rides where ride_id='{}' and owner_id='{}'"\
+                .format(ride_id, user_id[0])
+            result = db.execute(query)
+            return {'message': 'Ride offer deleted successfully'}
+        else:    
+            return {'message': 'Ride offer not found.'}, 404
 
 
 class AllRides(Resource):
