@@ -134,7 +134,7 @@ class RidesRetrievalTests(Base):
                       headers=self.headers_for_passenger)
         action = {"action": "accept"}
         # driver accepts ride offer
-        response = self.app.put('/api/v1/users/rides/1/requests/1',
+        response = self.app.put('/api/v1/users/rides/requests/1',
                                 data=json.dumps(action),
                                 content_type='application/json',
                                 headers=self.headers)
@@ -161,12 +161,12 @@ class RidesRetrievalTests(Base):
                       headers=self.headers_for_passenger)
         action = {"action": "accept"}
         # driver accepts ride offer
-        self.app.put('/api/v1/users/rides/1/requests/1',
+        self.app.put('/api/v1/users/rides/requests/1',
                                 data=json.dumps(action),
                                 content_type='application/json',
                                 headers=self.headers)
         action = {'action': 'canceled'}
-        response = self.app.put('/api/v1/users/rides/1/requests/1',
+        response = self.app.put('/api/v1/users/rides/requests/1',
                                 data=json.dumps(action),
                                 content_type='application/json',
                                 headers=self.headers)
@@ -187,7 +187,7 @@ class RidesRetrievalTests(Base):
                       data = json.dumps(self.request_data),
                       headers=self.headers_for_passenger)
         action = {"action": "reject"}
-        response = self.app.put('/api/v1/users/rides/1/requests/1',
+        response = self.app.put('/api/v1/users/rides/requests/1',
                                 data=json.dumps(action),
                                 content_type='application/json',
                                 headers=self.headers)
@@ -201,11 +201,11 @@ class RidesRetrievalTests(Base):
                       data = json.dumps(self.request_data),
                       headers=self.headers_for_passenger)
         action = {"action": "reject"}
-        self.app.put('/api/v1/users/rides/1/requests/1',
+        self.app.put('/api/v1/users/rides/requests/1',
                                 data=json.dumps(action),
                                 content_type='application/json',
                                 headers=self.headers)
-        response = self.app.put('/api/v1/users/rides/1/requests/1',
+        response = self.app.put('/api/v1/users/rides/requests/1',
                                 data=json.dumps(action),
                                 content_type='application/json',
                                 headers=self.headers)
