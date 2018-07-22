@@ -145,63 +145,44 @@ class Rides(Resource):
          'start time': ride[4], 'route': ride[5], 'available seats': ride[6]})
 
 
+
+
 class AllRides(Resource):
 
     @api.doc('Get Available rides',
              params={'ride_id': 'Id for a single ride offer'},
              responses={200: 'OK', 404: 'NOT FOUND'})
-    def get(self):
-        """Retrieves all available rides"""
+    def get(self, ride_id=None):
+        
+        query = ''
+        if ride_id is None:
+            query = "SELECT * from rides"
+        
+        else:
+            query = "SELECT * from rides where ride_id = {}"\
+                . format(ride_id)
+
         offer_filter = request.args
         if len(offer_filter) > 0:
             search_key = offer_filter['key']
             search_value = offer_filter['{}'.format(search_key)]
             query = "SELECT * from rides where {}='{}'".format(search_key, search_value)
+        
+        try:            
             result = db.execute(query)
             rows = result.fetchall()
+            if (len(rows) == 0) and (ride_id is not None):
+                # This works when user retrieves a single ride offer
+                return {'message': 'Offer not found'}, 404
             return jsonify([
                 {'id': row[0], 'start point': row[2],
-                 'destination': row[3], 'start_time': row[4], 'route': row[5],
-                 'available space': row[6]}
+                    'destination': row[3], 'start_time': row[4],
+                    'route': row[5],
+                    'available space': row[6]}
                 for row in rows])
-
-        try:
-            query = "SELECT * from rides"
-            result = db.execute(query)
-            rows = result.fetchall()
-            return jsonify([
-                {'id': row[0], 'start point': row[2],
-                 'destination': row[3], 'start_time': row[4], 'route': row[5],
-                 'available space': row[6]}
-                for row in rows])
+            
         except Exception as e:
             return {'message': 'Request not successful'}, 500
-
-
-class SingleRide(Resource):
-
-    @api.doc('Get Available rides',
-             params={'ride_id': 'Id for a single ride offer'},
-             responses={200: 'OK', 404: 'NOT FOUND'})
-    @jwt_required
-    def get(self, ride_id):
-        """Retrieves a single ride offer"""
-        try:
-            query = "SELECT * from rides where ride_id = {}"\
-                . format(ride_id)
-            result = db.execute(query)
-            rows = result.fetchall()
-
-            if len(rows) > 0:
-                return jsonify([
-                    {'id': row[0], 'start point': row[2],
-                     'destination': row[3], 'start_time': row[4],
-                     'route': row[5],
-                     'available space': row[6]}
-                    for row in rows])
-            return {'message': 'Offer not found'}, 404
-        except Exception as e:
-            return {'message': 'Request not successful.'}, 500
 
 
 class JoinRide(Resource):
@@ -276,12 +257,14 @@ class JoinRide(Resource):
             return {'message': 'Request not successful.'}, 500
 
 
+@api.route('/users/rides/<ride_id>/requests', '/users/rides/<rideId>/requests/<requestId>')
 class Requests(Resource):
 
     @api.doc('view user requests to a given ride offer',
              responses={200: 'OK', 404: 'NOT FOUND', 401: 'UNAUTHORIZED'},
              params={'ride_id': 'Id for ride user wants to view'})
     @jwt_required
+    # @api.route('/users/rides/<ride_id>/requests')
     def get(self, ride_id):
         """Retrieves all requests to a given ride"""
         try:
@@ -310,14 +293,12 @@ class Requests(Resource):
             return {'message': "You don't have any ride offer. "}, 404
         except Exception as e:  return e, 500
 
-
-class RequestActions(Resource):
-
-    @api.doc('view user requests to a given ride offer',
-             responses={200: 'OK', 404: 'NOT FOUND', 401: 'UNAUTHORIZED'},
-             params={'rideId': 'Id for ride user wants to view',
-                     'requestId': 'Id identifying the request'})
+    # @api.doc('view user requests to a given ride offer',
+    #          responses={200: 'OK', 404: 'NOT FOUND', 401: 'UNAUTHORIZED'},
+    #          params={'rideId': 'Id for ride user wants to view',
+    #                  'requestId': 'Id identifying the request'})
     @jwt_required
+    # @api.route('/users/rides/<rideId>/requests/<requestId>')
     def put(self, rideId, requestId):
         """Driver can accept or reject the ride offer."""
         try:
@@ -369,8 +350,6 @@ class RequestActions(Resource):
 
 
 api.add_resource(Rides, '/users/rides', '/users/rides/<ride_id>')
-api.add_resource(AllRides, '/rides')
-api.add_resource(SingleRide, '/rides/<string:ride_id>')
+api.add_resource(AllRides, '/rides', '/rides/<string:ride_id>')
 api.add_resource(JoinRide, '/rides/<ride_id>/requests')
-api.add_resource(Requests, '/users/rides/<ride_id>/requests')
-api.add_resource(RequestActions, '/users/rides/<rideId>/requests/<requestId>')
+# api.add_resource(Requests, '/users/rides/<ride_id>/requests', '/users/rides/<ride_id>/requests/<requestId>')
