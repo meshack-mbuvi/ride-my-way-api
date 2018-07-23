@@ -32,7 +32,7 @@ class Database(object):
                        start_time timestamp NOT NULL, \
                        route varchar(255) NOT NULL, \
                        available_space Int NOT NULL, \
-                       FOREIGN KEY (owner_id) REFERENCES users(user_id) )',
+                       FOREIGN KEY (owner_id) REFERENCES users(user_id) on delete cascade)',
             'CREATE TABLE IF NOT EXISTS requests (req_id serial PRIMARY KEY,\
                        date_created timestamp,\
                        ride_id serial,\
@@ -41,8 +41,8 @@ class Database(object):
                        drop_off_point varchar(50) NOT NULL, \
                        seats_booked int NOT NULL, \
                        status varchar(50) NOT NULL, \
-                       FOREIGN KEY (ride_id) REFERENCES rides(ride_id), \
-                       FOREIGN KEY (user_id) REFERENCES users(user_id) )'
+                       FOREIGN KEY (ride_id) REFERENCES rides(ride_id) on delete cascade, \
+                       FOREIGN KEY (user_id) REFERENCES users(user_id) on delete cascade)'
         )
 
         try:
