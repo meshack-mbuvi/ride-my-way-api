@@ -11,13 +11,6 @@ from application.models.user_model import Passenger, Driver
 from application import db
 from . import blacklist
 
-try:
-    # Python 3
-    from urllib.parse import urlparse, parse_qs
-except ImportError:
-    # Python 2
-    from urlparse import urlparse, parse_qs
-
 api = Namespace('Users', Description='User operations')
 
 usermodel = api.model('sign up', {
