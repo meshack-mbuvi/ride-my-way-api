@@ -110,7 +110,7 @@ class UserLogin(Resource):
             return {"message": "Password or email cannot be empty."}, 401
 
         try:
-            query = "select password,user_type from users where email='{}'"\
+            query = "select password,user_type,firstname from users where email='{}'"\
                     . format(email)
             result = db.execute(query)
             user = result.fetchone()
@@ -121,7 +121,7 @@ class UserLogin(Resource):
             if check_password_hash(user[0], password):
                 token = create_access_token(identity=email)
                 return {'message': 'logged in.', 'token': token, \
-                        'user_type': user[1]}, 201
+                        'user_type': user[1], 'firstname': user[2]}, 201
             else:
                 return {'message': 'Invalid password.'}, 401
         except Exception as e:

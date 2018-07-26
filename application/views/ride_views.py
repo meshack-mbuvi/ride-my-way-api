@@ -167,6 +167,7 @@ class AllRides(Resource):
     @api.doc('Get Available rides',
              params={'ride_id': 'Id for a single ride offer'},
              responses={200: 'OK', 404: 'NOT FOUND'})
+    # @jwt_required
     def get(self, ride_id=None):
         
         query = ''
