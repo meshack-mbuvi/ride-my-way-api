@@ -65,7 +65,7 @@ class UserSignUp(Resource):
             result = db.execute(query)
             user = result.fetchone()
             if user is None:
-                if userData['driver'] is True:
+                if userData['driver']:
                     userObject = Driver(userData)
                     userObject.save()
                 else:
