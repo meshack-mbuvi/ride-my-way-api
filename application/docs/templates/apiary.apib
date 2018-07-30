@@ -84,6 +84,16 @@ To login, user must provide email or username and password.
         ]
 
 
+### user logout [POST /api/v1/auth/logout]
+
+User uses this endpoint for logout from their accounts.
+
++ Response 200 (application/json)
+    
+        [
+            {'message': "Successfully logged out"}
+        ]
+
 ### user profile [GET /api/v1/auth/profile]
 
 Through this endpoint, logged-in users can view their account details
@@ -109,7 +119,7 @@ User can upgrade his/her account to be a driver using this endpoint
 
         
         {
-            'user-type': 'Driver'
+            'user-type': 'driver'
         }
         
 
@@ -128,7 +138,7 @@ Users offer their rides by creating ride offers using this endpoint. The request
             }
         ]
     
-+ Response 200 (application/json)
++ Response 201 (application/json)
 
         {
            "message":"ride offer added successfully."
