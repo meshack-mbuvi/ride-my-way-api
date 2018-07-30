@@ -144,6 +144,29 @@ Users offer their rides by creating ride offers using this endpoint. The request
            "message":"ride offer added successfully."
         }
 
+## All rides have offered [GET /api/v1/users/rides]
+ Through this endpoint, users can view all available ride offers in the platform
+
++ Response 200 (application/json)
+
+        [
+            {
+               "id":1,
+                "start point": "Witeithye",
+                "destination": "Ngara",
+                "route": "Thika superhighway",
+                "start time": "June 10 2018 6:00AM",
+                "request count": 0
+            },
+           {
+               "id":2,
+                "route": "Thika-Ruaka",
+                "start point": "Thika,Goingwa",
+                "destination": "Ruaka",
+                "start time": "June 10 2018 6:00AM",
+                "request count": 1
+            }
+        ]
 
 ## Modify data for ride offer [/api/v1/users/rides/{ride_id}]
 + Parameters
@@ -208,7 +231,6 @@ Using this endpoint, users can edit details of a given ride offer.
                 "route": "Thika-Ruaka",
                 "start point": "Thika,Goingwa",
                 "destination": "Ruaka",
-                "route": "Thika superhighway,Northern By-pass",
                 "start time": "June 10 2018 6:00AM",
                 "available space": 9
             }

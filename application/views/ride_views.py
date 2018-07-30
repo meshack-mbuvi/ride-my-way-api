@@ -105,6 +105,25 @@ class Rides(Resource):
                     'make sure you provide all required fields.'}, 400
 
     @jwt_required
+    def get(self):
+        query = "SELECT user_id from users where email='{}'".format(get_jwt_identity())
+        result = db.execute(query)
+        user = result.fetchone()
+        query = "SELECT *, (select count(req_id) from requests where requests.ride_id=rides.ride_id)\
+         from rides where rides.owner_id='{}'".format(user[0])
+        result = db.execute(query)
+        rides = result.fetchall()
+        if (len(rides) == 0):
+            return {'message': 'You do not have ride offers'}, 404
+        else:
+            return jsonify([
+                {'id': row[0], 'start point': row[2],
+                    'destination': row[3], 'start_time': row[4],
+                    'route': row[5],
+                    'request count': row[7]}
+                for row in rides])
+
+    @jwt_required
     def put(self,ride_id):
         query = "select * from rides where ride_id='{}'".format(ride_id)
         result = db.execute(query)
