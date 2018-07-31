@@ -298,7 +298,7 @@ class Requests(Resource):
              responses={200: 'OK', 404: 'NOT FOUND', 401: 'UNAUTHORIZED'},
              params={'ride_id': 'Id for ride user wants to view'})
     @jwt_required
-    def get(self, ride_id):
+    def get(self, ride_id=None):
         """Retrieves all requests to a given ride"""
         try:
             # get owner id
@@ -309,21 +309,35 @@ class Requests(Resource):
             row = result.fetchone()
             owner_id = row[0]
 
-            query = "SELECT firstname,phone,pick_up_point,drop_off_point, seats_booked, \
-            start_time,status, req_id from users INNER JOIN requests \
+            if ride_id is not None:
+                query = "SELECT firstname,phone,pick_up_point,drop_off_point, seats_booked, \
+                start_time,status, req_id from users INNER JOIN requests \
                     ON requests.user_id = users.user_id INNER JOIN \
                     rides on rides.ride_id = '{}' where rides.owner_id = '{}'" \
                     . format(ride_id, owner_id)
-            result = db.execute(query)
-            rows = result.fetchall()
-            if len(rows) > 0:
-                return jsonify([{'Request Id':row[7],'name of user': row[0], 'user phone contact': row[1],
-                                 'pick up point': row[2],
-                                 'drop-off point': row[3],
-                                 'seats booked': row[4],
-                                 'start time': row[5],
-                                 'status': row[6]} for row in rows])
-            return {'message': "You do not have any ride offer."}, 404
+                result = db.execute(query)
+                rows = result.fetchall()
+                if len(rows) > 0:
+                    return jsonify([{'Request Id':row[7],'name of user': row[0], 'user phone contact': row[1],
+                                    'pick up point': row[2],
+                                    'drop-off point': row[3],
+                                    'seats booked': row[4],
+                                    'start time': row[5],
+                                    'status': row[6]} for row in rows])
+                return {'message': "There is no request to your ride offer."}, 404
+            else:
+                # Retrieve  user request history
+                query = "SELECT * from requests where user_id='{}'".format(owner_id)
+
+                result = db.execute(query)
+                rows = result.fetchall()
+                if len(rows) > 0:
+                    return jsonify([{'Request Id':row[0],'Date Requested': row[1],
+                                    'pick up point': row[4],
+                                    'drop-off point': row[5],
+                                    'seats booked': row[6],
+                                    'status': row[7]} for row in rows])
+                return {'message': "There is no request to your ride offer."}, 404           
         except Exception as e:  return e, 500
 
     @jwt_required
@@ -397,4 +411,4 @@ class Requests(Resource):
 api.add_resource(Rides, '/users/rides', '/users/rides/<ride_id>')
 api.add_resource(AllRides, '/rides', '/rides/<string:ride_id>')
 api.add_resource(JoinRide, '/rides/<ride_id>/requests')
-api.add_resource(Requests, '/users/rides/<ride_id>/requests', '/users/rides/requests/<request_id>')
+api.add_resource(Requests, '/users/rides/<ride_id>/requests', '/users/rides/requests/<request_id>', '/users/rides/requests')
