@@ -124,7 +124,7 @@ class RidesRetrievalTests(Base):
                                 headers=self.headers)
         self.assertEqual(response.status_code, 404)
         response_data = json.loads(response.get_data().decode('utf-8'))
-        self.assertEqual(response_data['message'], 'You do not have any ride offer.')
+        self.assertEqual(response_data['message'], 'There is no request to your ride offer.')
 
     def test_driver_can_accept_user_request(self):
         """test that a driver can accept users request."""
