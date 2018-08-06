@@ -342,7 +342,7 @@ class Requests(Resource):
 
     @jwt_required
     def put(self, request_id):
-        """Driver can accept or reject the ride offer."""
+        """Driver can accept or reject the ride offer.And users can take an accepted request"""
         try:
             action = request.args['action']
             response = ''
@@ -356,10 +356,21 @@ class Requests(Resource):
                         .format((result_rows[2]))
             result = db.execute(query)
             seats = result.fetchone()
-            available_seats = seats[0]            
+            available_seats = seats[0] 
+
+            if action.lower() == 'taken':
+                query = "update requests set status='{}' where requests.req_id='{}'"\
+                . format(True, int(request_id))
+                db.execute(query)
+                return {'message': 'Your request has been updated.'}
+            elif action.lower() == 'abandoned':
+                query = "update requests set status='{}' where requests.req_id='{}'"\
+                . format(True, int(request_id))
+                db.execute(query)
+                return {'message': 'Your request has been updated.'}
 
             # check for action to take
-            if action.lower() == 'accept':
+            elif action.lower() == 'accept':
                 if result_rows[0] == 'accepted':
                     return {'message': 'You already accepted this user request'},403
                 action = 'accepted'                
@@ -376,6 +387,8 @@ class Requests(Resource):
                     action = 'canceled'
                 elif result_rows[0] == 'rejected':
                     return {'message': 'Request already rejected'}
+                elif result_rows[0] == 'taken':
+                    return {'message': 'Reuest which is already taken cannot be modified.'}
                 else:
                     action = 'rejected'
                     response = {'message': 'Request rejected'}   

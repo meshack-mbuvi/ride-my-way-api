@@ -200,6 +200,8 @@ class RidesRetrievalTests(Base):
                                 headers=self.headers)
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'], 'Request already rejected')
+
+    
         
 
 if __name__ == '__main__':
