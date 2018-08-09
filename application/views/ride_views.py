@@ -318,6 +318,7 @@ class Requests(Resource):
                     . format(ride_id, owner_id)
                 result = db.execute(query)
                 rows = result.fetchall()
+                print(rows)
                 if len(rows) > 0:
                     return jsonify([{'Request Id':row[0],'Date Requested': row[1],
                                     'pick up point': row[4],
