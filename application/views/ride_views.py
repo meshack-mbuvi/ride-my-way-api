@@ -327,7 +327,13 @@ class Requests(Resource):
                 return {'message': "There is no request to your ride offer."}, 404
             else:
                 # Retrieve  user request history
-                query = "SELECT * from requests where user_id='{}'".format(owner_id)
+                filter = request.args['filter']
+                query = ''
+                if filter == 'taken':
+                    query = "SELECT * from requests where user_id='{}' and status='{}'"\
+                    .format(owner_id, 'taken')
+                else:
+                    query = "SELECT * from requests where user_id='{}'".format(owner_id)
 
                 result = db.execute(query)
                 rows = result.fetchall()
