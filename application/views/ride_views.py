@@ -298,7 +298,7 @@ class Requests(Resource):
              responses={200: 'OK', 404: 'NOT FOUND', 401: 'UNAUTHORIZED'},
              params={'ride_id': 'Id for ride user wants to view'})
     @jwt_required
-    def get(self, ride_id=None):
+    def get(self, ride_id=""):
         """Retrieves all requests to a given ride"""
         try:
             # get owner id
@@ -309,7 +309,7 @@ class Requests(Resource):
             row = result.fetchone()
             owner_id = row[0]
 
-            if ride_id is None:
+            if ride_id =="":
                 # Retrieve  user request history
                 filter = request.args['filter']
                 query = ''
@@ -332,8 +332,8 @@ class Requests(Resource):
                 query = "SELECT firstname,phone,pick_up_point,drop_off_point, seats_booked, \
                 start_time,status, req_id from users INNER JOIN requests \
                     ON requests.user_id = users.user_id INNER JOIN \
-                    rides on rides.ride_id = '{}' where rides.owner_id = '{}'" \
-                    . format(ride_id, owner_id)
+                    rides on rides.ride_id = '{}' where rides.ride_id = '{}'" \
+                    . format(ride_id, ride_id)
                 result = db.execute(query)
                 rows = result.fetchall()
                 if len(rows) > 0:
