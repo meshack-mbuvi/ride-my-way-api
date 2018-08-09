@@ -311,14 +311,7 @@ class Requests(Resource):
 
             if ride_id =="":
                 # Retrieve  user request history
-                filter = request.args['filter']
-                query = ''
-                if filter == 'taken':
-                    query = "SELECT * from requests where user_id='{}' and status='{}'"\
-                    .format(owner_id, 'taken')
-                else:
-                    query = "SELECT * from requests where user_id='{}'".format(owner_id)
-
+                
                 result = db.execute(query)
                 rows = result.fetchall()
                 if len(rows) > 0:
