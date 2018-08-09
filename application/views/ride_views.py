@@ -423,4 +423,4 @@ class Requests(Resource):
 api.add_resource(Rides, '/users/rides', '/users/rides/<ride_id>')
 api.add_resource(AllRides, '/rides', '/rides/<string:ride_id>')
 api.add_resource(JoinRide, '/rides/<ride_id>/requests')
-api.add_resource(Requests, '/users/rides/<ride_id>/requests', '/users/rides/requests/<request_id>', '/users/rides/requests')
+api.add_resource(Requests, '/users/rides/requests', '/users/rides/<ride_id>/requests', '/users/rides/requests/<request_id>')
