@@ -309,23 +309,7 @@ class Requests(Resource):
             row = result.fetchone()
             owner_id = row[0]
 
-            if ride_id is not None:
-                query = "SELECT firstname,phone,pick_up_point,drop_off_point, seats_booked, \
-                start_time,status, req_id from users INNER JOIN requests \
-                    ON requests.user_id = users.user_id INNER JOIN \
-                    rides on rides.ride_id = '{}' where rides.owner_id = '{}'" \
-                    . format(ride_id, owner_id)
-                result = db.execute(query)
-                rows = result.fetchall()
-                if len(rows) > 0:
-                    return jsonify([{'Request Id':row[7],'name of user': row[0], 'user phone contact': row[1],
-                                    'pick up point': row[2],
-                                    'drop-off point': row[3],
-                                    'seats booked': row[4],
-                                    'start time': row[5],
-                                    'status': row[6]} for row in rows])
-                return {'message': "There is no request to your ride offer."}, 404
-            else:
+            if ride_id is None:
                 # Retrieve  user request history
                 filter = request.args['filter']
                 query = ''
@@ -343,7 +327,23 @@ class Requests(Resource):
                                     'drop-off point': row[5],
                                     'seats booked': row[6],
                                     'status': row[7]} for row in rows])
-                return {'message': "There is no request to your ride offer."}, 404           
+                return {'message': "There is no request to your ride offer."}, 404
+            else:
+                query = "SELECT firstname,phone,pick_up_point,drop_off_point, seats_booked, \
+                start_time,status, req_id from users INNER JOIN requests \
+                    ON requests.user_id = users.user_id INNER JOIN \
+                    rides on rides.ride_id = '{}' where rides.owner_id = '{}'" \
+                    . format(ride_id, owner_id)
+                result = db.execute(query)
+                rows = result.fetchall()
+                if len(rows) > 0:
+                    return jsonify([{'Request Id':row[7],'name of user': row[0], 'user phone contact': row[1],
+                                    'pick up point': row[2],
+                                    'drop-off point': row[3],
+                                    'seats booked': row[4],
+                                    'start time': row[5],
+                                    'status': row[6]} for row in rows])
+                return {'message': "There is no request to your ride offer."}, 404          
         except Exception as e:  return e, 500
 
     @jwt_required
