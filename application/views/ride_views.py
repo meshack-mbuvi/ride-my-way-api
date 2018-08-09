@@ -311,7 +311,11 @@ class Requests(Resource):
 
             if ride_id =="":
                 # Retrieve  user request history
-                
+                query = "SELECT firstname,phone,pick_up_point,drop_off_point, seats_booked, \
+                start_time,status, req_id from users INNER JOIN requests \
+                    ON requests.user_id = users.user_id INNER JOIN \
+                    rides on rides.ride_id = '{}' where rides.owner_id = '{}'" \
+                    . format(ride_id, owner_id)
                 result = db.execute(query)
                 rows = result.fetchall()
                 if len(rows) > 0:
