@@ -308,12 +308,9 @@ class Requests(Resource):
             result = db.execute(query)
             row = result.fetchone()
             owner_id = row[0]
-
             if ride_id =="":
                 # Retrieve  user request history
-                # Retrieve  user request history
                 query = "SELECT * from requests where user_id='{}'".format(owner_id)
-
                 result = db.execute(query)
                 rows = result.fetchall()
                 if len(rows) > 0:
@@ -321,18 +318,10 @@ class Requests(Resource):
                                     'pick up point': row[4],
                                     'drop-off point': row[5],
                                     'seats booked': row[6],
-                                    'status': row[7]} for row in rows])
+                                    'status': row[7],
+                                    'successful': row[8]} for row in rows])
                 return {'message': "There is no request to your ride offer."}, 404 
-                result = db.execute(query)
-                rows = result.fetchall()
-                print(rows)
-                if len(rows) > 0:
-                    return jsonify([{'Request Id':row[0],'Date Requested': row[1],
-                                    'pick up point': row[4],
-                                    'drop-off point': row[5],
-                                    'seats booked': row[6],
-                                    'status': row[7]} for row in rows])
-                return {'message': "There is no request to your ride offer."}, 404
+                
             else:
                 query = "SELECT firstname,phone,pick_up_point,drop_off_point, seats_booked, \
                 start_time,status, req_id from users INNER JOIN requests \

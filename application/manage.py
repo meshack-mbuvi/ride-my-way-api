@@ -32,6 +32,7 @@ class Database(object):
                        start_time timestamp NOT NULL, \
                        route varchar(255) NOT NULL, \
                        available_space Int NOT NULL, \
+                       successful boolean default(False), \
                        FOREIGN KEY (owner_id) REFERENCES users(user_id) on delete cascade)',
             'CREATE TABLE IF NOT EXISTS requests (req_id serial PRIMARY KEY,\
                        date_created timestamp,\
