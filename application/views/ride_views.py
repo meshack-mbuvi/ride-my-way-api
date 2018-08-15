@@ -136,6 +136,20 @@ class Rides(Resource):
                     . format(current_user_email)
         result = db.execute(query)
         user_id = result.fetchone()
+        action = request.args['action']
+        if action is not None:
+            if action == True:
+                query = "update rides set successful='{}' where ride_id='{}'"\
+                    . format(True,int(ride_id))
+                db.execute(query)
+                return {'message':'Ride marked successful'}
+            else{
+                query = "update rides set successful='{}' where ride_id='{}'"\
+                    . format(False,int(ride_id))
+                db.execute(query)
+                return {'message':'Ride marked unsuccessful'}
+            }
+
         if not ride[1] == user_id[0]:
             return {'message': 'You cannot change \
                         details of ride offer you do not own'}, 401
