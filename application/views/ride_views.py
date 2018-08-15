@@ -142,12 +142,12 @@ class Rides(Resource):
                     . format(True,int(ride_id))
                 db.execute(query)
                 return {'message':'Ride marked successful'}
-            else{
+            else:
                 query = "update rides set successful='{}' where ride_id='{}'"\
                     . format(False,int(ride_id))
                 db.execute(query)
                 return {'message':'Ride marked unsuccessful'}
-            }
+            
 
         if not ride[1] == user_id[0]:
             return {'message': 'You cannot change \
