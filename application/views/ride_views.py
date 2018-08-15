@@ -120,7 +120,7 @@ class Rides(Resource):
                 {'id': row[0], 'start point': row[2],
                     'destination': row[3], 'start_time': row[4],
                     'route': row[5],
-                    'request count': row[7]}
+                    'request count': row[8]}
                 for row in rides])
 
     @jwt_required
