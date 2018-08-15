@@ -120,7 +120,8 @@ class Rides(Resource):
                 {'id': row[0], 'start point': row[2],
                     'destination': row[3], 'start_time': row[4],
                     'route': row[5],
-                    'request count': row[7]}
+                    'request count': row[7],
+                    'successful': row[8]}
                 for row in rides])
 
     @jwt_required
@@ -318,8 +319,7 @@ class Requests(Resource):
                                     'pick up point': row[4],
                                     'drop-off point': row[5],
                                     'seats booked': row[6],
-                                    'status': row[7],
-                                    'successful': row[8]} for row in rows])
+                                    'status': row[7]} for row in rows])
                 return {'message': "There is no request to your ride offer."}, 404 
                 
             else:
