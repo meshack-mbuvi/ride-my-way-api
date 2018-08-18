@@ -128,6 +128,7 @@ class Rides(Resource):
         query = "select * from rides where ride_id='{}'".format(ride_id)
         result = db.execute(query)
         ride = result.fetchone()
+        
         if ride is None:
             return {'message': 'Offer with given id does not exist'}, 404
         current_user_email = get_jwt_identity()
@@ -135,9 +136,10 @@ class Rides(Resource):
                     . format(current_user_email)
         result = db.execute(query)
         user_id = result.fetchone()
-        action = request.args['action']
-        if action is not None:
-            if action == True:
+        args = request.args
+
+        if len(args) > 0:
+            if args['action'] == True:
                 query = "update rides set successful='{}' where ride_id='{}'"\
                     . format(True,int(ride_id))
                 db.execute(query)
