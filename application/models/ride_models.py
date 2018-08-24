@@ -14,8 +14,8 @@ class RideOffer():
     def __init__(self, ridedata):
         self.start_point = ridedata['start point']
         self.destination = ridedata['destination']
-        date = datetime.strptime(ridedata['start time'], '%B %d %Y %I:%M%p')
-        self.start_time = datetime.strftime(date, '%B %d %Y %I:%M%p')
+        date = datetime.strptime(ridedata['start time'], '%Y-%m-%d %H:%M')
+        self.start_time = datetime.strftime(date, '%Y-%m-%d %H:%M')
         self.route = ridedata['route']
         self.available_space = ridedata['available space']
 

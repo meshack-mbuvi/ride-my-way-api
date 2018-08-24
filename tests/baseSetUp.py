@@ -76,7 +76,7 @@ class Base(unittest.TestCase):
             "start point": "Witeithye",
             "destination": "Ngara",
             "route": "Thika superhighway",
-            "start time": "June 10 2030 6:00AM",
+            "start time": "2018-09-01 6:00",
             "available space": 6
         }
 
@@ -84,7 +84,7 @@ class Base(unittest.TestCase):
             "start point": "Githurai",
             "destination": "Nairobi",
             "route": "Thika superhighway",
-            "start time": "June 10 2030 6:00AM",
+            "start time": "2019-10-01 6:00",
             "available space": 3
         }
 
@@ -92,14 +92,14 @@ class Base(unittest.TestCase):
             "start point": "Witeithye",
             "destination": "Ngara",
             "route": "Thika superhighway",
-            "start time": "June 10 1900 6:00AM",
-            "available space": 6
+            "start time": "2012-11-02 6:00",
+            "available space": 3
         }
         self.wrong_ride = {
             "start point": "Witeithye",
             "destination": "Ngara",
             "route": "Thika superhighway",
-            "start time": "June 10 2018 6:00AM",
+            "start time": "2020-11-03 6:00",
             "available space": "Ten"
         }
         self.ride_with_wrong_date = {

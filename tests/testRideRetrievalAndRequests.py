@@ -60,7 +60,7 @@ class RidesRetrievalTests(Base):
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response_data['message'],
-                         "Your request has been send.")
+                         "Your request has been recorded.")
 
     def test_user_cannot_request_a_ride_twice(self):
         """test user cannot request to join a ride twice."""
