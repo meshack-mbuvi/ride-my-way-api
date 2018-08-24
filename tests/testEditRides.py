@@ -15,7 +15,7 @@ class EditRides(Base):
             "start point": "Juja",
             "destination": "Ngara Market",
             "route": "Thika superhighway",
-            "start time": "June 10 2030 6:00AM",
+            "start time": "2030-09-10 6:00",
             "available space": 5
         }
     def tearDown(self):
@@ -37,7 +37,6 @@ class EditRides(Base):
                             data=json.dumps(self.ride),
                             content_type='application/json',
                             headers=self.headers_for_passenger)
-        print(response.get_data().decode('utf-8'))
         self.assertEqual(response.status_code, 401)
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],'You cannot change \
@@ -59,10 +58,9 @@ class EditRides(Base):
                                  content_type='application/json',
                                  headers=self.headers)
         self.assertEqual(response.status_code, 400)
-
         response_data = json.loads(response.get_data().decode('utf-8'))
         self.assertEqual(response_data['message'],
-                         "use correct format for date and time.")
+                        "use correct format for date and time.")
 
 if __name__ == '__main__':
     unittest.main()

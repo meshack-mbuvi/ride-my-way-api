@@ -25,12 +25,13 @@ def past_date(date_string):
     """checks whether date given is a past date
     :returns True for past date, False otherwise."""
     try:
-        str_to_date = datetime.strptime(date_string, "%B %m %Y %I:%M%p").date()
+        str_to_date = datetime.strptime(date_string, "%Y-%m-%d %H:%M").date()
         if str_to_date > datetime.now().date():
             return False
         return True
     except Exception as e:
         # catch invalid date format
+        print(e)
         return {'message':
                         'use correct format for date and time.'}, 400
 
@@ -39,10 +40,11 @@ def convert_date(date_string):
     """:Returns
         : start_time(str) a string representation for time is successful"""
     try:
-        date = datetime.strptime(date_string, '%B %d %Y %I:%M%p')
-        startTime = datetime.strftime(date, '%B %d %Y %I:%M%p')
+        date = datetime.strptime(date_string, '%Y-%m-%d %H:%M')
+        startTime = datetime.strftime(date, '%Y-%m-%d %H:%M')
         return startTime
     except Exception as e:
+        print(e)
         return {'message':
                         'use correct format for date and time.'}, 400
 
@@ -120,6 +122,8 @@ class Rides(Resource):
                 {'id': row[0], 'start point': row[2],
                     'destination': row[3], 'start_time': row[4],
                     'route': row[5],
+                    'Available space': row[6],
+                    'successful': row[7],
                     'request count': row[8]}
                 for row in rides])
 
@@ -139,16 +143,16 @@ class Rides(Resource):
         args = request.args
 
         if len(args) > 0:
-            if args['action'] == True:
+            if args['action'] == 'true':
                 query = "update rides set successful='{}' where ride_id='{}'"\
                     . format(True,int(ride_id))
                 db.execute(query)
-                return {'message':'Ride marked successful'}
+                return {'message':'Ride marked as successful'}
             else:
                 query = "update rides set successful='{}' where ride_id='{}'"\
                     . format(False,int(ride_id))
                 db.execute(query)
-                return {'message':'Ride marked unsuccessful'}
+                return {'message':'Ride marked as unsuccessful'}
             
 
         if not ride[1] == user_id[0]:
@@ -297,7 +301,7 @@ class JoinRide(Resource):
                                  . format(datetime.now(), ride_id, user_id, pick_up, drop_off, \
                                   seats_booked, status)
                     db.execute(query)
-                    return {'message': 'Your request has been send.'}, 201
+                    return {'message': 'Your request has been recorded.'}, 201
                 # user has already requested to join this ride offer
                 return{'message': 'You already requested this ride.'}, 403
             else:
@@ -372,15 +376,16 @@ class Requests(Resource):
             result = db.execute(query)
             seats = result.fetchone()
             available_seats = seats[0] 
+            print(action)
 
             if action.lower() == 'taken':
                 query = "update requests set status='{}' where requests.req_id='{}'"\
-                . format(True, int(request_id))
+                . format('taken', int(request_id))
                 db.execute(query)
                 return {'message': 'Your request has been updated.'}
             elif action.lower() == 'abandoned':
                 query = "update requests set status='{}' where requests.req_id='{}'"\
-                . format(True, int(request_id))
+                . format('abadoned', int(request_id))
                 db.execute(query)
                 return {'message': 'Your request has been updated.'}
 
@@ -388,10 +393,9 @@ class Requests(Resource):
             elif action.lower() == 'accept':
                 if result_rows[0] == 'accepted':
                     return {'message': 'You already accepted this user request'},403
-                action = 'accepted'                
+                action = 'accepted'
                 # Decrement the available seats by one
                 available_seats -= result_rows[1]
-                
                 # set message to be returned to user after request update cycle
                 response = {'message': 'Request accepted'}
             else:
