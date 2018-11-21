@@ -17,7 +17,12 @@ Users register their accounts using this endpoint so that they can access offers
             "email": "your email address",
             "password": "your password",
             "phone": "phone number",
+<<<<<<< HEAD:apiary.apib
             "confirm_password": "confirm your password"
+=======
+            "confirm_password": "confirm your password",
+            "driver":"True for drive, False for a normal user"
+>>>>>>> develop:application/docs/templates/apiary.apib
         }
         
         
@@ -76,12 +81,28 @@ To login, user must provide email or username and password.
         [
             {
                 "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzY290Y2guaW8iLCJleHAiOjEzMDA4MTkzODAsIm5hbWUiOiJDaHJpcyBTZXZpbGxlamEiLCJhZG1pbiI6dHJ1ZX0.03f329983b86f7d9a9f5fef85305880101d5e302afafa20154d094b229f75773",
-                "message":"logged in"
+                "message":"logged in",
+                "user_type":"passenger/driver",
+                "firstname": "{firstname}"
             }
         ]
 
 
+<<<<<<< HEAD:apiary.apib
 ### user login [GET /api/v1/auth/profile]
+=======
+### user logout [POST /api/v1/auth/logout]
+
+User uses this endpoint for logout from their accounts.
+
++ Response 200 (application/json)
+    
+        [
+            {'message': "Successfully logged out"}
+        ]
+
+### user profile [GET /api/v1/auth/profile]
+>>>>>>> develop:application/docs/templates/apiary.apib
 
 Through this endpoint, logged-in users can view their account details
 
@@ -93,11 +114,32 @@ Through this endpoint, logged-in users can view their account details
             "firstname": "your firstname",
             "secondname": "your secondname",
             "email": "your email address",
+<<<<<<< HEAD:apiary.apib
             "phone": "phone number"
         }
         
 
 ### New ride offer [POST /api/v1/users/rides]
+=======
+            "phone": "phone number",
+            "user_type":"passenger/driver"
+        }
+
+
+### Upgrade user account [PUT /api/v1/auth/upgrade?query=upgrade]
+User can upgrade his/her account to be a driver using this endpoint
+
+     
++ Response 200 (application/json)
+
+        
+        {
+            'user-type': 'driver'
+        }
+        
+
+## New ride offer [POST /api/v1/users/rides]
+>>>>>>> develop:application/docs/templates/apiary.apib
 Users offer their rides by creating ride offers using this endpoint. The request to create a ride offer must be in the format shown in the request body.
 
 + Request (application/json)
@@ -112,14 +154,87 @@ Users offer their rides by creating ride offers using this endpoint. The request
             }
         ]
     
-+ Response 200 (application/json)
++ Response 201 (application/json)
 
         {
            "message":"ride offer added successfully."
         }
+<<<<<<< HEAD:apiary.apib
         
 
 ### Retrieve all rides [GET /api/v1/rides]
+=======
+
+## All rides have offered [GET /api/v1/users/rides]
+ Through this endpoint, users can view all available ride offers in the platform
+
++ Response 200 (application/json)
+
+        [
+            {
+               "id":1,
+                "start point": "Witeithye",
+                "destination": "Ngara",
+                "route": "Thika superhighway",
+                "start time": "June 10 2018 6:00AM",
+                "request count": 0
+            },
+           {
+               "id":2,
+                "route": "Thika-Ruaka",
+                "start point": "Thika,Goingwa",
+                "destination": "Ruaka",
+                "start time": "June 10 2018 6:00AM",
+                "request count": 1
+            }
+        ]
+
+## Modify data for ride offer [/api/v1/users/rides/{ride_id}]
++ Parameters
+    + ride_id(required, integer)
+
+
+### Delete ride offer [DELETE]
+This endpoint can be used by Users to delete their rides.
+    
++ Response 200 (application/json)
+
+        {
+           "message":"Ride offer deleted successfully"
+        }        
+
+### Update details of a ride offer [PUT]
+Using this endpoint, users can edit details of a given ride offer.
+
++ Request (application/json)
+
+        [
+            {
+                "start point": "Juja",
+                "destination": "Ngara Market",
+                "route": "Thika superhighway",
+                "start time": "June 10 2030 6:00AM",
+                "available space": 4
+            }
+        ]
+
+
++ Response 200 (application/json)
+
+        {
+            "id": {ride_id},
+            "start point": "Juja",
+            "destination": "Ngara Market",
+            "route": "Thika superhighway",
+            "start time": "June 10 2030 6:00AM", 
+            "available seats": 4
+        }
+
+
+## Retrieve ride offers [/api/v1/rides]
+
+### All rides [GET ]
+>>>>>>> develop:application/docs/templates/apiary.apib
  Through this endpoint, users can view all available ride offers in the platform
 
 + Response 200 (application/json)
@@ -138,19 +253,34 @@ Users offer their rides by creating ride offers using this endpoint. The request
                 "route": "Thika-Ruaka",
                 "start point": "Thika,Goingwa",
                 "destination": "Ruaka",
-                "route": "Thika superhighway,Northern By-pass",
                 "start time": "June 10 2018 6:00AM",
                 "available space": 9
             }
         ]
+<<<<<<< HEAD:apiary.apib
     
 ### Retrieve a single ride offer [GET /api/v1/rides/{ride_id}]
 Users retrieve details of a given ride offer through this endpoint.
+=======
+
+### Retrieve all rides which meet search criteria [GET /api/v1/rides?key=search_key&search_key=search_value]
+ Through this endpoint, users can view all available ride offers meeting the given search criteria
+
++ Response 200 (application/json)
+
+        json data for all rides meeting the given search criteria
+    
+### Retrieve a single ride offer [GET /api/v1/rides/{ride_id}]
+Users retrieve details of a given ride offer through this endpoint.
++ Parameters 
+  + ride_id(required, integer)
+
+>>>>>>> develop:application/docs/templates/apiary.apib
 + Response 200 (application/json)
 
         [
             {
-                "id":1,
+                "id":ride_id,
                 "start point": "Witeithye",
                 "destination": "Ngara",
                 "route": "Thika superhighway",
@@ -160,10 +290,19 @@ Users retrieve details of a given ride offer through this endpoint.
         ]
     
 
+<<<<<<< HEAD:apiary.apib
 ### Join a particular ride offer [POST /api/v1/rides/<rideId>/requests]
 Users are able to request to join a ride offer through this endpoint. They need to
 send thier request in the following format.
 
+=======
+### Join a particular ride offer [POST /api/v1/rides/{rideId}/requests]
+Users are able to request to join a ride offer through this endpoint. They need to
+send their request in the following format.
+
++ Parameters 
+  + rideId(required, integer)
+>>>>>>> develop:application/docs/templates/apiary.apib
 + Request (application/json)
 
         [
@@ -185,6 +324,11 @@ send thier request in the following format.
 
 ### View user request [GET /api/v1/users/rides/{ride_id}/requests]
 This endpoint is used by drivers to view all user requests for their ride offers.
+<<<<<<< HEAD:apiary.apib
+=======
++ Parameters 
+  + ride_id(required, integer)
+>>>>>>> develop:application/docs/templates/apiary.apib
 
 + Response 200 (application/json)
 
@@ -206,17 +350,31 @@ This endpoint is used by drivers to view all user requests for their ride offers
                 "user phone": "719801509"
             }
         ]
+<<<<<<< HEAD:apiary.apib
         
 ### Accept/reject user reques [PUT /api/v1/users/rides/{ride_id}/requests/requestId]
 
 Through this endpoint, driver can accept or reject user's request to join a ride offer.
+=======
 
-+ Request (application/json)
+### Cancel request to a ride offer request [DELETE /api/v1/users/rides/{ride_id}/requests]
+This endpoint is used by drivers to view all user requests for their ride offers.
++ Parameters 
+  + ride_id(required, integer)
+>>>>>>> develop:application/docs/templates/apiary.apib
 
-            {
-            "action": "accept"
-            }
-            
++ Response 200 (application/json)
+
+        [
+            {"message": "Your request has been deleted."}
+        ]
+        
+### Accept user request [PUT /api/v1/users/rides/requests/{request_id}?action=accept]
+Through this endpoint, driver can accept or reject user's request to join a ride offer.
+
++ Parameters 
+  + request_id(required, integer)
+         
 + Response 200 (application/json)
 
         [
@@ -226,12 +384,12 @@ Through this endpoint, driver can accept or reject user's request to join a ride
         ]
 
 
-+ Request (application/json)
+### Reject user request [PUT /api/v1/users/rides/requests/{request_id}?action=reject]
+Through this endpoint, driver can accept or reject user's request to join a ride offer.
 
-            {
-            "action": "reject"
-            }
-            
++ Parameters 
+  + request_id(required, integer)
+       
 + Response 200 (application/json)
 
         [
@@ -239,3 +397,4 @@ Through this endpoint, driver can accept or reject user's request to join a ride
                 "message":"Requests rejected"
             }
         ]
+        
